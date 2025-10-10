@@ -17,12 +17,12 @@ export const ProfileIcon = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(45, 138, 71, 0.3);
+  box-shadow: 0 2px 8px rgba(205, 160, 155, 0.3);
 
   &:hover {
     background: ${theme.colors.primaryLight};
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(45, 138, 71, 0.4);
+    box-shadow: 0 4px 12px rgba(205, 160, 155, 0.4);
   }
 
   svg {

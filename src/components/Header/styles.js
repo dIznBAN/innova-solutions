@@ -76,11 +76,11 @@ export const NavItem = styled.a`
 
   &:hover {
     color: ${theme.colors.primary};
-    background: rgba(45, 138, 71, 0.1);
+    background: rgba(205, 160, 155, 0.1);
   }
 
   &.active {
     color: ${theme.colors.primary};
-    background: rgba(45, 138, 71, 0.15);
+    background: rgba(205, 160, 155, 0.15);
   }
 `

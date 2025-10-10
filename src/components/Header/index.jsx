@@ -25,6 +25,13 @@ const Header = () => {
           >
             Cupons
           </NavItem>
+          <NavItem 
+            as={Link} 
+            to="/cadastro-parceiro"
+            className={location.pathname === '/cadastro-parceiro' ? 'active' : ''}
+          >
+            Seja Parceiro
+          </NavItem>
         </Nav>
       </CenterNav>
       

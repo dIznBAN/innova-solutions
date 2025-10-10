@@ -63,6 +63,6 @@ export const CouponButton = styled.button`
   margin-top: auto;
 
   &:hover {
-    background: #FFC107;
+    background: ${theme.colors.primaryLight};
   }
 `

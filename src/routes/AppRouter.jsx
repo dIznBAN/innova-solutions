@@ -3,6 +3,8 @@ import Home from '../containers/Home'
 import AuthPage from '../pages/Auth'
 import ForgotPasswordPage from '../pages/ForgotPassword'
 import CouponsPage from '../pages/Coupons'
+import PartnerRegister from '../pages/PartnerRegister'
+import Admin from '../pages/Admin'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Container } from './styles'
@@ -17,7 +19,7 @@ const ProfilePage = () => (
 // Componente para controlar quando mostrar Header e Footer
 const Layout = ({ children }) => {
   const location = useLocation()
-  const hideHeaderFooter = ['/login', '/registro', '/esqueceu-senha'].includes(location.pathname)
+  const hideHeaderFooter = ['/login', '/registro', '/esqueceu-senha', '/cadastro-parceiro'].includes(location.pathname)
   
   return (
     <Container>
@@ -39,6 +41,8 @@ const AppRouter = () => {
           <Route path="/registro" element={<AuthPage />} />
           <Route path="/esqueceu-senha" element={<ForgotPasswordPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/cadastro-parceiro" element={<PartnerRegister />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Layout>
     </Router>

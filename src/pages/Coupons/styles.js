@@ -59,7 +59,7 @@ export const SearchInput = styled.input`
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(45, 138, 71, 0.1);
+    box-shadow: 0 0 0 3px rgba(205, 160, 155, 0.1);
   }
 
   &::placeholder {
@@ -224,7 +224,7 @@ export const ApplyFiltersButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(45, 138, 71, 0.3);
+    box-shadow: 0 8px 25px rgba(205, 160, 155, 0.3);
   }
 `
 
@@ -322,7 +322,7 @@ export const CouponButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(45, 138, 71, 0.3);
+    box-shadow: 0 5px 15px rgba(205, 160, 155, 0.3);
   }
 `
 

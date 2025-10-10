@@ -5,6 +5,7 @@ import {
   FaTimes,
   FaCheck,
 } from "react-icons/fa";
+import CouponModal from "../../components/CouponModal";
 import bellaJoiasImg from "../../assets/bella.joias.jpeg";
 import glamourStoreImg from "../../assets/glamour_store.jpeg";
 import luxoAcessoriosImg from "../../assets/luxo.acessorios.jpeg";
@@ -46,6 +47,8 @@ import {
 const CouponsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
     sortBy: "",
   });
@@ -60,70 +63,90 @@ const CouponsPage = () => {
       storeName: "Vivara",
       discount: 40,
       image: vivaraImg,
-      affiliateLink: "https://www.vivara.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.vivara.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Descubra a elegância das joias Vivara com 40% de desconto em peças selecionadas.",
+      validUntil: "31/12/2024",
     },
     {
       id: 2,
       storeName: "Rommanel",
       discount: 35,
       image: rommanelImg,
-      affiliateLink: "https://www.rommanel.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.rommanel.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Semijoias Rommanel com 35% de desconto. Qualidade e beleza em cada peça.",
+      validUntil: "15/01/2025",
     },
     {
       id: 3,
       storeName: "MJ Folheados",
       discount: 50,
       image: mjFolheadosImg,
-      affiliateLink: "https://www.mjfolheados.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.mjfolheados.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Mega promoção MJ Folheados! 50% OFF em toda a coleção de semijoias.",
+      validUntil: "20/12/2024",
     },
     {
       id: 4,
       storeName: "Life Semijoias",
       discount: 30,
       image: lifeSemijoisImg,
-      affiliateLink: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Semijoias Life com 30% de desconto. Estilo e sofisticação para o seu dia a dia.",
+      validUntil: "10/01/2025",
     },
     {
       id: 5,
       storeName: "Bella Acessórios",
       discount: 45,
       image: bellaAcessoriosImg,
-      affiliateLink: "https://www.bellaacessorios.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.bellaacessorios.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Bella Acessórios com 45% OFF! Renove seu guarda-roupa com nossos acessórios únicos.",
+      validUntil: "25/12/2024",
     },
     {
       id: 6,
       storeName: "Deluxe Joias",
       discount: 25,
       image: deluxeJoiasImg,
-      affiliateLink: "https://www.deluxejoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.deluxejoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Joias Deluxe com 25% de desconto. Luxo e qualidade em cada peça especial.",
+      validUntil: "05/02/2025",
     },
     {
       id: 7,
       storeName: "Innova Solutions",
       discount: 60,
       image: innovaSolutionsImg,
-      affiliateLink: "https://www.innovasolutions.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.innovasolutions.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Super oferta Innova Solutions! 60% de desconto em produtos selecionados.",
+      validUntil: "30/11/2024",
     },
     {
       id: 8,
       storeName: "Glamour Store",
       discount: 35,
       image: glamourStoreImg,
-      affiliateLink: "https://www.glamourstore.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.glamourstore.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Glamour Store com 35% OFF. Acessórios que destacam sua personalidade.",
+      validUntil: "18/01/2025",
     },
     {
       id: 9,
       storeName: "Bella Joias",
       discount: 20,
       image: bellaJoiasImg,
-      affiliateLink: "https://www.bellajoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.bellajoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Bella Joias oferece 20% de desconto em toda a coleção de semijoias.",
+      validUntil: "12/01/2025",
     },
     {
       id: 10,
       storeName: "Life Semijoias",
       discount: 55,
       image: lifeSemijoisImg,
-      affiliateLink: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      website: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
+      description: "Oferta especial Life Semijoias! 55% OFF em peças da nova coleção.",
+      validUntil: "28/12/2024",
     },
   ]);
 
@@ -262,8 +285,11 @@ const CouponsPage = () => {
                 <Discount>{coupon.discount}% OFF</Discount>
 
 
-                <CouponButton onClick={() => window.open(coupon.affiliateLink, '_blank')}>
-                  Aproveitar Oferta
+                <CouponButton onClick={() => {
+                  setSelectedCoupon(coupon)
+                  setShowModal(true)
+                }}>
+                  Ver Detalhes
                 </CouponButton>
               </CouponContent>
             </CouponCard>
@@ -275,6 +301,15 @@ const CouponsPage = () => {
           <p>Tente ajustar os filtros ou buscar por outro termo</p>
         </NoResults>
       )}
+      
+      <CouponModal 
+        coupon={selectedCoupon}
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false)
+          setSelectedCoupon(null)
+        }}
+      />
     </Container>
   );
 };

@@ -15,7 +15,7 @@ export const Card = styled.div`
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   padding: 2.5rem;
   position: relative;
 `
@@ -46,7 +46,22 @@ export const Title = styled.h1`
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
+`
+
+export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`
+
+export const SectionTitle = styled.h3`
+  color: ${theme.colors.primary};
+  font-family: ${theme.fonts.secondary};
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid ${theme.colors.secondary};
+  padding-bottom: 0.5rem;
 `
 
 export const InputGroup = styled.div`
@@ -64,16 +79,41 @@ export const InputIcon = styled.div`
 
 export const Input = styled.input`
   width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
-  border: 2px solid ${theme.colors.lightGray};
+  padding: 1rem;
+  border: 2px solid ${props => props.error ? '#e74c3c' : theme.colors.lightGray};
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
+    border-color: ${props => props.error ? '#e74c3c' : theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.error ? 'rgba(231, 76, 60, 0.1)' : 'rgba(205, 160, 155, 0.1)'};
+  }
+
+  &::placeholder {
+    color: ${theme.colors.gray};
+  }
+`
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid ${theme.colors.lightGray};
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: ${theme.fonts.primary};
+  resize: vertical;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
     border-color: ${theme.colors.primary};
     box-shadow: 0 0 0 3px rgba(205, 160, 155, 0.1);
+  }
+
+  &::placeholder {
+    color: ${theme.colors.gray};
   }
 `
 
@@ -95,23 +135,9 @@ export const SubmitButton = styled.button`
   }
 `
 
-export const SuccessMessage = styled.div`
-  background: linear-gradient(135deg, ${theme.colors.success} 0%, #66BB6A 100%);
-  color: ${theme.colors.white};
-  padding: 2rem;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  animation: slideIn 0.3s ease;
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+export const ErrorMessage = styled.span`
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  display: block;
 `

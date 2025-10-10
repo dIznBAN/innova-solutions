@@ -67,6 +67,6 @@ export const HeroButton = styled.a`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(202,199,182,0.4);
+    box-shadow: 0 8px 25px rgba(244, 232, 230, 0.6);
   }
 `
