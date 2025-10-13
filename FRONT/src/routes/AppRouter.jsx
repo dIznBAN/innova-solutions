@@ -5,17 +5,11 @@ import ForgotPasswordPage from '../pages/ForgotPassword'
 import CouponsPage from '../pages/Coupons'
 import PartnerRegister from '../pages/PartnerRegister'
 import Admin from '../pages/Admin'
+import ProfilePage from '../pages/Profile'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { Container } from './styles'
-
-const ProfilePage = () => (
-  <div style={{ padding: '6rem 2rem 2rem', textAlign: 'center', minHeight: '60vh' }}>
-    <h1>Perfil do Usuário</h1>
-    <p>Em desenvolvimento...</p>
-  </div>
-)
 
 // Componente para controlar quando mostrar Header e Footer
 const Layout = ({ children }) => {

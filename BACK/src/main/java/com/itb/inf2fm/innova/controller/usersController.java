@@ -1,6 +1,7 @@
 package com.itb.inf2fm.innova.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,11 @@ public class usersController {
 
     @Autowired
     private usersService usersService;
+
+    @GetMapping
+    public ResponseEntity<List<users>> getAllUsers() {
+        return ResponseEntity.ok(usersService.findAll());
+    }
 
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
@@ -107,6 +113,13 @@ public class usersController {
             Long usersId = Long.parseLong(id);
             users usersExistente = usersService.findById(usersId); // já lança exceção se não achar
 
+            // Verifica se o email já existe para outro usuário
+            if (!usersExistente.getEmail().equals(users.getEmail()) && usersService.emailExiste(users.getEmail())) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Email já cadastrado para outro usuário");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             usersExistente.setName(users.getName());
             usersExistente.setEmail(users.getEmail());
             usersExistente.setPasswordHash(users.getPasswordHash());
@@ -126,6 +139,58 @@ public class usersController {
             errorResponse.put("status", 404);
             errorResponse.put("error", "Not Found");
             errorResponse.put("message", "Usuario não encontrada com o id " + id);
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<Object> getProfile(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(usersService.findById(Long.parseLong(id)));
+        } catch (NumberFormatException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 400);
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", "O id informado não é válido: " + id);
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 404);
+            errorResponse.put("error", "Not Found");
+            errorResponse.put("message", "Usuario não encontrado com o id " + id);
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<Object> updateProfile(@PathVariable String id, @RequestBody users users) {
+        try {
+            Long usersId = Long.parseLong(id);
+            users usersExistente = usersService.findById(usersId);
+
+            if (!usersExistente.getEmail().equals(users.getEmail()) && usersService.emailExiste(users.getEmail())) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Email já cadastrado para outro usuário");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            usersExistente.setName(users.getName());
+            usersExistente.setEmail(users.getEmail());
+            usersExistente.setPasswordHash(users.getPasswordHash());
+
+            users userAtualizada = usersService.save(usersExistente);
+            return ResponseEntity.ok(userAtualizada);
+        } catch (NumberFormatException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 400);
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", "O id informado não é válido: " + id);
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 404);
+            errorResponse.put("error", "Not Found");
+            errorResponse.put("message", "Usuario não encontrado com o id " + id);
             return ResponseEntity.status(404).body(errorResponse);
         }
     }

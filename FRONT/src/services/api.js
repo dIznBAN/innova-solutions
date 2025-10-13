@@ -67,6 +67,22 @@ class ApiService {
       body: JSON.stringify(userData),
     });
   }
+
+  async getUserById(id) {
+    return this.request(`/users/${id}`);
+  }
+
+  // Profile endpoints
+  async getProfile(id) {
+    return this.request(`/users/profile/${id}`);
+  }
+
+  async updateProfile(id, userData) {
+    return this.request(`/users/profile/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
 }
 
 export default new ApiService();
