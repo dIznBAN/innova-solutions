@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaUser } from 'react-icons/fa'
+import { FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { useClickOutside } from '../../hooks/useClickOutside'
+import { useAuth } from '../../hooks/useAuth.jsx'
 import { Container, ProfileIcon, Dropdown, DropdownItem } from './styles'
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // Estado do usuário
+  const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const dropdownRef = useClickOutside(() => setIsOpen(false))
 
   const handleProfileClick = () => {
-    if (isLoggedIn) {
+    if (isAuthenticated) {
       navigate('/perfil')
     } else {
       setIsOpen(!isOpen)
@@ -28,15 +29,30 @@ const ProfileDropdown = () => {
     navigate('/registro')
   }
 
+  const handleLogout = () => {
+    logout()
+    setIsOpen(false)
+    navigate('/')
+  }
+
   return (
     <Container ref={dropdownRef}>
-      <ProfileIcon onClick={handleProfileClick}>
+      <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.name : 'Menu do usuário'}>
         <FaUser />
       </ProfileIcon>
-      {isOpen && !isLoggedIn && (
+      {isOpen && !isAuthenticated && (
         <Dropdown>
           <DropdownItem onClick={handleLogin}>Entrar</DropdownItem>
           <DropdownItem onClick={handleRegister}>Criar conta</DropdownItem>
+        </Dropdown>
+      )}
+      {isOpen && isAuthenticated && (
+        <Dropdown>
+          <DropdownItem onClick={() => { setIsOpen(false); navigate('/perfil'); }}>Meu Perfil</DropdownItem>
+          <DropdownItem onClick={handleLogout}>
+            <FaSignOutAlt style={{ marginRight: '8px' }} />
+            Sair
+          </DropdownItem>
         </Dropdown>
       )}
     </Container>

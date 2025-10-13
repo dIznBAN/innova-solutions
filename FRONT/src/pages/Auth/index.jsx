@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import ApiService from "../../services/api";
+import { useAuth } from "../../hooks/useAuth.jsx";
 import {
   Container,
   AuthCard,
@@ -22,7 +24,10 @@ import { Logo } from "../../components/Header/styles";
 
 const AuthPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (location.pathname === "/registro") {
@@ -79,7 +84,7 @@ const AuthPage = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
 
@@ -88,17 +93,35 @@ const AuthPage = () => {
       return;
     }
 
+    setLoading(true);
     setErrors({});
-    setSuccessMessage(
-      activeTab === "login"
-        ? "Login realizado com sucesso!"
-        : "Conta criada com sucesso!"
-    );
+    setSuccessMessage("");
 
-    setTimeout(() => {
-      setSuccessMessage("");
-      setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-    }, 3000);
+    try {
+      if (activeTab === "login") {
+        const user = await ApiService.login(formData.email, formData.password);
+        setSuccessMessage("Login realizado com sucesso!");
+        authLogin(user);
+        setTimeout(() => navigate('/'), 1500);
+      } else {
+        const userData = {
+          name: formData.name,
+          email: formData.email,
+          passwordHash: formData.password
+        };
+        await ApiService.register(userData);
+        setSuccessMessage("Conta criada com sucesso! Faça login para continuar.");
+        setTimeout(() => {
+          setActiveTab("login");
+          setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+          setSuccessMessage("");
+        }, 2000);
+      }
+    } catch (error) {
+      setErrors({ general: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -126,6 +149,7 @@ const AuthPage = () => {
 
         <FormContainer>
           {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
 
           <Form onSubmit={handleSubmit}>
             {activeTab === "register" && (
@@ -204,8 +228,8 @@ const AuthPage = () => {
               </InputGroup>
             )}
 
-            <SubmitButton type="submit">
-              {activeTab === "login" ? "Entrar" : "Criar Conta"}
+            <SubmitButton type="submit" disabled={loading}>
+              {loading ? "Carregando..." : (activeTab === "login" ? "Entrar" : "Criar Conta")}
             </SubmitButton>
 
             {activeTab === "login" && (

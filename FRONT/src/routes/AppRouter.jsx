@@ -7,6 +7,7 @@ import PartnerRegister from '../pages/PartnerRegister'
 import Admin from '../pages/Admin'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import ProtectedRoute from '../components/ProtectedRoute'
 import { Container } from './styles'
 
 const ProfilePage = () => (
@@ -40,9 +41,9 @@ const AppRouter = () => {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/registro" element={<AuthPage />} />
           <Route path="/esqueceu-senha" element={<ForgotPasswordPage />} />
-          <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/cadastro-parceiro" element={<PartnerRegister />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         </Routes>
       </Layout>
     </Router>

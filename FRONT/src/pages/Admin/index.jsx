@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { FaTrash } from 'react-icons/fa'
+import ApiService from '../../services/api'
 import {
   Container,
   Header,
@@ -42,7 +44,42 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredPartners, setFilteredPartners] = useState(mockPartners)
   const [filteredCoupons, setFilteredCoupons] = useState(mockCoupons)
-  const [filteredUsers, setFilteredUsers] = useState(mockUsers)
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const [realUsers, setRealUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (activeTab === 'users') {
+      loadUsers()
+    }
+  }, [activeTab])
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true)
+      const users = await ApiService.getAllUsers()
+      setRealUsers(users)
+      setFilteredUsers(users)
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteUser = async (id) => {
+    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+      try {
+        await ApiService.deleteUser(id)
+        const updatedUsers = realUsers.filter(user => user.id !== id)
+        setRealUsers(updatedUsers)
+        setFilteredUsers(updatedUsers)
+      } catch (error) {
+        console.error('Erro ao excluir usuário:', error)
+        alert('Erro ao excluir usuário')
+      }
+    }
+  }
 
   const handleApprove = (id, type) => {
     console.log(`Aprovando ${type} ID: ${id}`)
@@ -74,10 +111,17 @@ const Admin = () => {
       coupon.partner.toLowerCase().includes(searchLower)
     ))
     
-    setFilteredUsers(mockUsers.filter(user => 
-      user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower)
-    ))
+    if (activeTab === 'users') {
+      setFilteredUsers(realUsers.filter(user => 
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower)
+      ))
+    } else {
+      setFilteredUsers(mockUsers.filter(user => 
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower)
+      ))
+    }
   }
 
   return (
@@ -213,31 +257,29 @@ const Admin = () => {
         {activeTab === 'users' && (
           <Table>
             <TableHeader>
+              <TableCell>ID</TableCell>
               <TableCell>Nome</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Cupons Usados</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Ações</TableCell>
             </TableHeader>
-            {filteredUsers.map(user => (
-              <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.cuponsUsados}</TableCell>
-                <TableCell>{user.status}</TableCell>
-                <TableCell>
-                  {user.status === 'Ativo' ? (
-                    <ActionButton reject onClick={() => handleReject(user.id, 'user')}>
-                      Desativar
-                    </ActionButton>
-                  ) : (
-                    <ActionButton approve onClick={() => handleApprove(user.id, 'user')}>
-                      Ativar
-                    </ActionButton>
-                  )}
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan="4" style={{textAlign: 'center'}}>Carregando usuários...</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredUsers.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <ActionButton reject onClick={() => handleDeleteUser(user.id)}>
+                      <FaTrash /> Excluir
+                    </ActionButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </Table>
         )}
       </TabContent>
