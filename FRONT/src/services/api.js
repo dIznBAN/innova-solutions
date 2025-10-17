@@ -83,6 +83,13 @@ class ApiService {
       body: JSON.stringify(userData),
     });
   }
+
+  async deleteAccount(id, passwordHash) {
+    return this.request(`/users/account/${id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ passwordHash }),
+    });
+  }
 }
 
 export default new ApiService();

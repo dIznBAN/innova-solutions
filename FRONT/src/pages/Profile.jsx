@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import styled from 'styled-components';
 
@@ -180,11 +181,82 @@ const SuccessMessage = styled.div`
   margin-bottom: 1rem;
 `;
 
+const DangerZone = styled.div`
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+
+  h3 {
+    color: #dc3545;
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+`;
+
+const DeleteButton = styled.button`
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #c82333;
+  }
+`;
+
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  h3 {
+    color: #dc3545;
+    margin: 0 0 1rem 0;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+`;
+
 const ProfilePage = () => {
-  const { user, login } = useAuth();
+  const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -258,6 +330,38 @@ const ProfilePage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      setMessage({ type: 'error', text: 'Digite sua senha para confirmar' });
+      return;
+    }
+
+    setDeleteLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      await apiService.deleteAccount(user.id, deletePassword);
+      logout();
+      navigate('/auth');
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || 'Erro ao excluir conta' });
+      setShowDeleteModal(false);
+      setDeletePassword('');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+    setMessage({ type: '', text: '' });
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeletePassword('');
   };
 
   if (!user) {
@@ -345,14 +449,52 @@ const ProfilePage = () => {
             </ButtonGroup>
           </Form>
         ) : (
-          <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-            <h3>Informações da Conta</h3>
-            <p><strong>Nome:</strong> {user.name}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Última atualização:</strong> {user.updated_at ? new Date(user.updated_at).toLocaleDateString('pt-BR') : 'Nunca'}</p>
-          </div>
+          <>
+            <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h3>Informações da Conta</h3>
+              <p><strong>Nome:</strong> {user.name}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>Última atualização:</strong> {user.updated_at ? new Date(user.updated_at).toLocaleDateString('pt-BR') : 'Nunca'}</p>
+            </div>
+
+            <DangerZone>
+              <h3>Zona de Perigo</h3>
+              <p>Esta ação é irreversível. Todos os seus dados serão permanentemente excluídos.</p>
+              <DeleteButton onClick={openDeleteModal}>
+                Excluir Conta
+              </DeleteButton>
+            </DangerZone>
+          </>
         )}
       </ProfileCard>
+
+      {showDeleteModal && (
+        <Modal>
+          <ModalContent>
+            <h3>Confirmar Exclusão da Conta</h3>
+            <p>Digite sua senha para confirmar a exclusão permanente da sua conta:</p>
+            
+            <FormGroup>
+              <Input
+                type="password"
+                placeholder="Digite sua senha"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleDeleteAccount()}
+              />
+            </FormGroup>
+
+            <ButtonGroup>
+              <DeleteButton onClick={handleDeleteAccount} disabled={deleteLoading}>
+                {deleteLoading ? 'Excluindo...' : 'Confirmar Exclusão'}
+              </DeleteButton>
+              <CancelButton onClick={closeDeleteModal}>
+                Cancelar
+              </CancelButton>
+            </ButtonGroup>
+          </ModalContent>
+        </Modal>
+      )}
     </Container>
   );
 };

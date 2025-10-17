@@ -218,4 +218,36 @@ public class usersController {
         }
     }
 
+    @DeleteMapping("/account/{id}")
+    public ResponseEntity<Object> excluirPropriaConta(@PathVariable String id, @RequestBody Map<String, String> dados) {
+        try {
+            Long usersId = Long.parseLong(id);
+            users usuario = usersService.findById(usersId);
+            
+            // Verifica se a senha fornecida está correta
+            if (!usuario.getPasswordHash().equals(dados.get("passwordHash"))) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Senha incorreta");
+                return ResponseEntity.status(401).body(response);
+            }
+            
+            usersService.delete(usersId);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Conta excluída com sucesso");
+            return ResponseEntity.ok(response);
+        } catch (NumberFormatException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 400);
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", "O id informado não é válido: " + id);
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 404);
+            errorResponse.put("error", "Not Found");
+            errorResponse.put("message", "Usuario não encontrado com o id " + id);
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
 }
