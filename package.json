@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "vite build",
+    "build": "npx vite build",
     "vercel-build": "npm ci && npm run build"
   },
   "dependencies": {
