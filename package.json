@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "build": "npm run build",
-    "vercel-build": "npm ci && npm run build"
+    "build": "cd FRONT && npm ci && npm run build",
+    "vercel-build": "cd FRONT && npm ci && npm run build"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.6.0",
