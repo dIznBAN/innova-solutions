@@ -1,9 +1,12 @@
 {
   "scripts": {
-    "build": "npx vite build",
+    "build": "npm run build",
     "vercel-build": "npm ci && npm run build"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "vite": "^6.3.6"
   }
 }
