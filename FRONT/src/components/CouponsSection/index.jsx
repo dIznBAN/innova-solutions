@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import CouponCard from "../CouponCard";
 import { Container, Title, CouponsGrid } from "./styles";
 import bellaJoiasImg from "../../assets/bella.joias.jpeg";
@@ -41,17 +42,60 @@ const CouponsSection = () => {
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <Container>
-      <Title>Mais Cupons</Title>
-      <CouponsGrid>
+      <Title
+        as={motion.h2}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        Mais Cupons
+      </Title>
+      
+      <CouponsGrid
+        as={motion.div}
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+      >
         {coupons.map((coupon, index) => (
-          <CouponCard
+          <motion.div
             key={index}
-            storeName={coupon.storeName}
-            discount={coupon.discount}
-            image={coupon.image}
-          />
+            variants={itemVariants}
+          >
+            <CouponCard
+              storeName={coupon.storeName}
+              discount={coupon.discount}
+              image={coupon.image}
+              index={index}
+            />
+          </motion.div>
         ))}
       </CouponsGrid>
     </Container>
