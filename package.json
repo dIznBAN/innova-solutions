@@ -1,8 +1,9 @@
 {
   "scripts": {
+    "build": "vite build",
     "vercel-build": "npm ci && npm run build"
   },
-  "devDependencies": {
+  "dependencies": {
     "vite": "^6.3.6"
   }
 }
