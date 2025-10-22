@@ -2,7 +2,12 @@ package com.itb.inf2fm.innova.model.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "stores")
@@ -24,6 +29,33 @@ public class stores {
     private LocalDateTime updated_at;
     @Column(nullable = false, length = 50)
     private String status;
+    @Column
+    private Double avaliacao = 0.0;
+    @Column
+    private Integer total_avaliacoes;
+    @Column(nullable = false, length = 100)
+    private String cidade;
+
+    public String getCidade() {
+        return cidade;
+    }
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public Double getAvaliacao() {
+        return avaliacao;
+    }
+    public void setAvaliacao(Double avaliacao) {
+        this.avaliacao = avaliacao;
+    }
+
+    public Integer getTotalAvaliacoes() {
+        return total_avaliacoes;
+    }
+    public void setTotalAvaliacoes(Integer totalAvaliacoes) {
+        this.total_avaliacoes = total_avaliacoes;
+    }
 
 
     public Long getId() {
