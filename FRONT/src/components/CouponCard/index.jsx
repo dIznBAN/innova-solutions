@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Eye, Percent } from 'lucide-react';
 import { Card, StoreImage, StoreName, Discount, CouponButton, ImageContainer, DiscountBadge } from "./styles";
 
-const CouponCard = ({ storeName, discount, image, index }) => {
+const CouponCard = ({ storeName, discount, image, index, onViewCoupon }) => {
   return (
     <Card
       as={motion.div}
@@ -47,6 +47,7 @@ const CouponCard = ({ storeName, discount, image, index }) => {
           boxShadow: "0 6px 20px rgba(205, 160, 155, 0.3)"
         }}
         whileTap={{ scale: 0.98 }}
+        onClick={onViewCoupon}
       >
         <Eye size={16} />
         Ver Cupom

@@ -40,7 +40,7 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
           <Section>
             <SectionTitle>Descrição da Oferta</SectionTitle>
             <Text>
-              {coupon.description || `Aproveite ${coupon.discount} de desconto em toda a loja ${coupon.storeName}. Uma oportunidade única para renovar seu estilo com produtos de qualidade.`}
+              {coupon.description || `Aproveite ${coupon.discount}% de desconto em toda a loja ${coupon.storeName}. Uma oportunidade única para renovar seu estilo com produtos de qualidade.`}
             </Text>
           </Section>
 

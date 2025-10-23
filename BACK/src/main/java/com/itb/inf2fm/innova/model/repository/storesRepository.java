@@ -16,11 +16,11 @@ public interface storesRepository extends JpaRepository<stores, Long> {
         List<stores> findByName(String name);
           
         // Buscar bazares com avaliação mínima
-        @Query("SELECT b FROM stores b WHERE b.avaliacao >= :avaliacao = true ORDER BY b.avaliacao DESC")
+        @Query("SELECT b FROM stores b WHERE b.avaliacao >= :avaliacao ORDER BY b.avaliacao DESC")
         List<stores> findByAvaliacaoMinima(@Param("avaliacao") Double avaliacao);
         
         // Buscar bazares mais bem avaliados
-        @Query("SELECT b FROM stores = true ORDER BY b.avaliacao DESC, b.total_avaliacoes DESC")
+        @Query("SELECT b FROM stores b ORDER BY b.avaliacao DESC, b.total_avaliacoes DESC")
         List<stores> findTopRated();
 
          // Buscar por cidade

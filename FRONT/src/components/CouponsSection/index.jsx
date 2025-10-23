@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CouponCard from "../CouponCard";
+import CouponModal from "../CouponModal";
 import { Container, Title, CouponsGrid } from "./styles";
 import bellaJoiasImg from "../../assets/bella.joias.jpeg";
 import glamourStoreImg from "../../assets/glamour_store.jpeg";
@@ -9,6 +11,19 @@ import deluxeJoiasImg from "../../assets/deluxe_joias.png";
 import bellaAcessoriosImg from "../../assets/bella_acessorios.png";
 
 const CouponsSection = () => {
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = (coupon) => {
+    setSelectedCoupon(coupon);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCoupon(null);
+  };
+
   const coupons = [
     {
       storeName: "Bella Joias",
@@ -94,10 +109,17 @@ const CouponsSection = () => {
               discount={coupon.discount}
               image={coupon.image}
               index={index}
+              onViewCoupon={() => handleOpenModal(coupon)}
             />
           </motion.div>
         ))}
       </CouponsGrid>
+      
+      <CouponModal
+        coupon={selectedCoupon}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </Container>
   );
 };
