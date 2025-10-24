@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaUser, FaSignOutAlt } from 'react-icons/fa'
+import { FaUser, FaSignOutAlt, FaTicketAlt } from 'react-icons/fa'
 import { useClickOutside } from '../../hooks/useClickOutside'
 import { useAuth } from '../../hooks/useAuth.jsx'
 import { Container, ProfileIcon, Dropdown, DropdownItem } from './styles'
@@ -49,6 +49,10 @@ const ProfileDropdown = () => {
       {isOpen && isAuthenticated && (
         <Dropdown>
           <DropdownItem onClick={() => { setIsOpen(false); navigate('/perfil'); }}>Meu Perfil</DropdownItem>
+          <DropdownItem onClick={() => { setIsOpen(false); navigate('/meus-cupons'); }}>
+            <FaTicketAlt style={{ marginRight: '8px' }} />
+            Meus Cupons
+          </DropdownItem>
           <DropdownItem onClick={handleLogout}>
             <FaSignOutAlt style={{ marginRight: '8px' }} />
             Sair

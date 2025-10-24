@@ -65,7 +65,7 @@ const CouponsPage = () => {
       image: vivaraImg,
       website: "https://www.vivara.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Descubra a elegância das joias Vivara com 40% de desconto em peças selecionadas.",
-      validUntil: "31/12/2024",
+      validUntil: "15/11/2025",
     },
     {
       id: 2,
@@ -74,7 +74,7 @@ const CouponsPage = () => {
       image: rommanelImg,
       website: "https://www.rommanel.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Semijoias Rommanel com 35% de desconto. Qualidade e beleza em cada peça.",
-      validUntil: "15/01/2025",
+      validUntil: "28/11/2025",
     },
     {
       id: 3,
@@ -83,7 +83,7 @@ const CouponsPage = () => {
       image: mjFolheadosImg,
       website: "https://www.mjfolheados.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Mega promoção MJ Folheados! 50% OFF em toda a coleção de semijoias.",
-      validUntil: "20/12/2024",
+      validUntil: "15/11/2025",
     },
     {
       id: 4,
@@ -92,7 +92,7 @@ const CouponsPage = () => {
       image: lifeSemijoisImg,
       website: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Semijoias Life com 30% de desconto. Estilo e sofisticação para o seu dia a dia.",
-      validUntil: "10/01/2025",
+      validUntil: "20/11/2025",
     },
     {
       id: 5,
@@ -101,7 +101,7 @@ const CouponsPage = () => {
       image: bellaAcessoriosImg,
       website: "https://www.bellaacessorios.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Bella Acessórios com 45% OFF! Renove seu guarda-roupa com nossos acessórios únicos.",
-      validUntil: "25/12/2024",
+      validUntil: "25/11/2025",
     },
     {
       id: 6,
@@ -110,7 +110,7 @@ const CouponsPage = () => {
       image: deluxeJoiasImg,
       website: "https://www.deluxejoias.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Joias Deluxe com 25% de desconto. Luxo e qualidade em cada peça especial.",
-      validUntil: "05/02/2025",
+      validUntil: "15/11/2025",
     },
     {
       id: 7,
@@ -119,7 +119,7 @@ const CouponsPage = () => {
       image: innovaSolutionsImg,
       website: "https://www.innovasolutions.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Super oferta Innova Solutions! 60% de desconto em produtos selecionados.",
-      validUntil: "30/11/2024",
+      validUntil: "30/11/2025",
     },
     {
       id: 8,
@@ -128,7 +128,7 @@ const CouponsPage = () => {
       image: glamourStoreImg,
       website: "https://www.glamourstore.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Glamour Store com 35% OFF. Acessórios que destacam sua personalidade.",
-      validUntil: "18/01/2025",
+      validUntil: "12/11/2025",
     },
     {
       id: 9,
@@ -137,7 +137,7 @@ const CouponsPage = () => {
       image: bellaJoiasImg,
       website: "https://www.bellajoias.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Bella Joias oferece 20% de desconto em toda a coleção de semijoias.",
-      validUntil: "12/01/2025",
+      validUntil: "08/11/2025",
     },
     {
       id: 10,
@@ -146,7 +146,7 @@ const CouponsPage = () => {
       image: lifeSemijoisImg,
       website: "https://www.lifesemijoias.com.br/?utm_source=affiliate&utm_medium=coupon",
       description: "Oferta especial Life Semijoias! 55% OFF em peças da nova coleção.",
-      validUntil: "28/12/2024",
+      validUntil: "18/11/2025",
     },
   ]);
 

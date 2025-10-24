@@ -19,10 +19,24 @@ import {
 
 const CouponModal = ({ coupon, isOpen, onClose }) => {
   if (!isOpen || !coupon) return null
+  
+
 
   const handleUseOffer = () => {
-    window.open(coupon.website || '#', '_blank')
-    onClose()
+    // Salvar cupom no localStorage
+    const savedCoupons = JSON.parse(localStorage.getItem('myCoupons') || '[]')
+    const couponExists = savedCoupons.find(c => c.id === coupon.id)
+    
+    if (!couponExists) {
+      savedCoupons.push(coupon)
+      localStorage.setItem('myCoupons', JSON.stringify(savedCoupons))
+    }
+    
+    // Mostrar mensagem de sucesso
+    alert('Cupom adicionado a Meus Cupons!')
+    
+    // Redirecionar para Meus Cupons
+    window.location.href = '/meus-cupons'
   }
 
   return (

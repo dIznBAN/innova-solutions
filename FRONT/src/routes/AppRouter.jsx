@@ -3,6 +3,7 @@ import Home from '../containers/Home'
 import AuthPage from '../pages/Auth'
 import ForgotPasswordPage from '../pages/ForgotPassword'
 import CouponsPage from '../pages/Coupons'
+import MyCouponsPage from '../pages/MyCoupons'
 import PartnerRegister from '../pages/PartnerRegister'
 import Admin from '../pages/Admin'
 import ProfilePage from '../pages/Profile'
@@ -32,6 +33,7 @@ const AppRouter = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cupons" element={<CouponsPage />} />
+          <Route path="/meus-cupons" element={<ProtectedRoute><MyCouponsPage /></ProtectedRoute>} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/registro" element={<AuthPage />} />
           <Route path="/esqueceu-senha" element={<ForgotPasswordPage />} />

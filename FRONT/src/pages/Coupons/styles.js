@@ -2,10 +2,14 @@ import styled from 'styled-components'
 import { theme } from '../../theme'
 
 export const Container = styled.div`
-  padding: 6rem 2rem 2rem;
+  padding: 8rem 2rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
+  
+  @media (max-width: ${theme.breakpoints.mobile}) {
+    padding: 6rem 1rem 2rem;
+  }
 `
 
 export const Header = styled.div`
