@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { FaUser, FaSignOutAlt, FaTicketAlt } from 'react-icons/fa'
 import { useClickOutside } from '../../hooks/useClickOutside'
 import { useAuth } from '../../hooks/useAuth.jsx'
-import { Container, ProfileIcon, Dropdown, DropdownItem } from './styles'
+import { Container, ProfileIcon, Dropdown, DropdownItem, UserInfo, UserName, UserStatus } from './styles'
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -32,11 +33,18 @@ const ProfileDropdown = () => {
   const handleLogout = () => {
     logout()
     setIsOpen(false)
+    toast.success('Conta desconectada com sucesso!')
     navigate('/')
   }
 
   return (
     <Container ref={dropdownRef}>
+      {isAuthenticated && (
+        <UserInfo>
+          <UserName>{user?.name}</UserName>
+          <UserStatus>Conectado</UserStatus>
+        </UserInfo>
+      )}
       <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.name : 'Menu do usuário'}>
         <FaUser />
       </ProfileIcon>

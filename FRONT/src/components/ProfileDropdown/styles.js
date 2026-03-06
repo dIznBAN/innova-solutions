@@ -3,6 +3,49 @@ import { theme } from '../../theme'
 
 export const Container = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`
+
+export const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  
+  @media (max-width: ${theme.breakpoints.mobile}) {
+    display: none;
+  }
+`
+
+export const UserName = styled.span`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${theme.colors.text};
+  line-height: 1.2;
+`
+
+export const UserStatus = styled.span`
+  font-size: 0.75rem;
+  color: ${theme.colors.primary};
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${theme.colors.primary};
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
 `
 
 export const ProfileIcon = styled.button`

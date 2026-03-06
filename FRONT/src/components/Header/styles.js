@@ -66,7 +66,7 @@ export const ProfileSection = styled.div`
 `
 
 export const NavItem = styled.a`
-  color: ${theme.colors.text};
+  color: #1A1A1A;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s;
@@ -75,12 +75,12 @@ export const NavItem = styled.a`
   position: relative;
 
   &:hover {
-    color: ${theme.colors.primary};
-    background: rgba(205, 160, 155, 0.1);
+    color: #8B5A50;
+    background: rgba(166, 113, 104, 0.1);
   }
 
   &.active {
-    color: ${theme.colors.primary};
-    background: rgba(205, 160, 155, 0.15);
+    color: #8B5A50;
+    background: rgba(166, 113, 104, 0.15);
   }
 `

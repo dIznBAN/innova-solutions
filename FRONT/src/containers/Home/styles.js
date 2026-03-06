@@ -18,7 +18,7 @@ export const Container = styled.div`
 `;
 
 export const HeroSection = styled.section`
-  background: linear-gradient(135deg, #CDA09B 0%, #E6BDB6 100%);
+  background: linear-gradient(135deg, #A67168 0%, #CDA09B 100%);
   min-height: 70vh;
   display: flex;
   align-items: center;
@@ -85,47 +85,41 @@ export const HeroContent = styled.div`
 export const HeroTitle = styled.h1`
   font-family: 'Poppins', sans-serif;
   color: #FFFFFF;
-  font-size: 3.5rem;
+  font-size: 4rem;
   margin-bottom: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.2;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  
-  background: linear-gradient(45deg, #FFFFFF, #F0F0F0);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: ${shimmer} 3s ease-in-out infinite;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.5px;
 
   @media (max-width: ${theme.breakpoints.mobile}) {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   
   @media (max-width: 480px) {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
 `;
 
 export const HeroSubtitle = styled.p`
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.4rem;
   margin-bottom: 3rem;
   font-family: 'Inter', sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.6;
   max-width: 600px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   
   @media (max-width: ${theme.breakpoints.mobile}) {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     margin-bottom: 2rem;
   }
 `;
 
 export const HeroButton = styled.a`
   background: #FFFFFF;
-  color: #CDA09B;
+  color: #8B5A50;
   text-decoration: none;
   padding: 1.2rem 2.5rem;
   font-size: 1.1rem;
@@ -142,7 +136,7 @@ export const HeroButton = styled.a`
   
   &:hover {
     background: #F8F8F8;
-    color: #B8918C;
+    color: #6B4540;
     transform: translateY(-2px);
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
   }
