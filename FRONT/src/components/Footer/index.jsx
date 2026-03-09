@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link as RouterLink } from 'react-router-dom';
 import { Phone, Mail, FileText, Shield, Info, HelpCircle } from 'lucide-react';
 import { 
   Container, 
@@ -63,7 +64,7 @@ const Footer = () => {
           
           <Column as={motion.div} variants={itemVariants}>
             <SectionTitle>Links Úteis</SectionTitle>
-            <Link href="#">
+            <Link as={RouterLink} to="/termos-de-uso">
               <FileText size={14} />
               Termos de Uso
             </Link>
@@ -75,17 +76,13 @@ const Footer = () => {
               <Info size={14} />
               Sobre Nós
             </Link>
-            <Link href="#">
-              <HelpCircle size={14} />
-              Central de Ajuda
-            </Link>
           </Column>
         </FooterGrid>
         
         <Divider as={motion.div} variants={itemVariants} />
         
         <Copyright as={motion.p} variants={itemVariants}>
-          © 2025 Innova Solutions - Todos os direitos reservados
+          © 2026 Innova Solutions - Todos os direitos reservados
         </Copyright>
       </Content>
     </Container>

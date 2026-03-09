@@ -73,7 +73,34 @@ public class usersController {
             response.put("message", "Email já cadastrado");
             return ResponseEntity.badRequest().body(response);
         }
+        
+        String passwordError = validatePassword(users.getPasswordHash());
+        if (passwordError != null) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", passwordError);
+            return ResponseEntity.badRequest().body(response);
+        }
+        
         return ResponseEntity.ok(usersService.save(users));
+    }
+    
+    private String validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            return "A senha deve ter no mínimo 8 caracteres";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            return "A senha deve conter pelo menos uma letra maiúscula";
+        }
+        if (!password.matches(".*[a-z].*")) {
+            return "A senha deve conter pelo menos uma letra minúscula";
+        }
+        if (!password.matches(".*\\d.*")) {
+            return "A senha deve conter pelo menos um número";
+        }
+        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+            return "A senha deve conter pelo menos um caractere especial";
+        }
+        return null;
     }
 
     @PostMapping("/login")

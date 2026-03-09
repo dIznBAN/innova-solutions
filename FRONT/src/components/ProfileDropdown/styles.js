@@ -52,7 +52,7 @@ export const ProfileIcon = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: ${theme.colors.primary};
+  background: ${props => props.$hasImage ? 'transparent' : theme.colors.primary};
   color: ${theme.colors.white};
   border: none;
   display: flex;
@@ -61,9 +61,17 @@ export const ProfileIcon = styled.button`
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 2px 8px rgba(205, 160, 155, 0.3);
+  overflow: hidden;
+  padding: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   &:hover {
-    background: ${theme.colors.primaryLight};
+    background: ${props => props.$hasImage ? 'transparent' : theme.colors.primaryLight};
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(205, 160, 155, 0.4);
   }

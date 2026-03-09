@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaCamera } from "react-icons/fa";
 import ApiService from "../../services/api";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import {
@@ -18,6 +18,9 @@ import {
   ForgotPassword,
   ErrorMessage,
   SuccessMessage,
+  PhotoUpload,
+  PhotoPreview,
+  PhotoLabel
 } from "./styles";
 import { LogoContainer } from "./styles";
 import { Logo } from "../../components/Header/styles";
@@ -43,6 +46,7 @@ const AuthPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    profilePicture: ""
   });
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
@@ -52,6 +56,22 @@ const AuthPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, photo: "Imagem muito grande. Máximo 5MB" }));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, profilePicture: reader.result }));
+        setErrors((prev) => ({ ...prev, photo: "" }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -66,8 +86,17 @@ const AuthPage = () => {
 
     if (!formData.password) {
       newErrors.password = "Senha é obrigatória";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
+    } else if (activeTab === "register") {
+      const passwordErrors = [];
+      if (formData.password.length < 8) passwordErrors.push("8 caracteres");
+      if (!/[A-Z]/.test(formData.password)) passwordErrors.push("1 maiúscula");
+      if (!/[a-z]/.test(formData.password)) passwordErrors.push("1 minúscula");
+      if (!/\d/.test(formData.password)) passwordErrors.push("1 número");
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) passwordErrors.push("1 caractere especial");
+      
+      if (passwordErrors.length > 0) {
+        newErrors.password = `Faltando: ${passwordErrors.join(", ")}`;
+      }
     }
 
     if (activeTab === "register") {
@@ -107,13 +136,14 @@ const AuthPage = () => {
         const userData = {
           name: formData.name,
           email: formData.email,
-          passwordHash: formData.password
+          passwordHash: formData.password,
+          profilePicture: formData.profilePicture || null
         };
         await ApiService.register(userData);
         setSuccessMessage("Conta criada com sucesso! Faça login para continuar.");
         setTimeout(() => {
           setActiveTab("login");
-          setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+          setFormData({ name: "", email: "", password: "", confirmPassword: "", profilePicture: "" });
           setSuccessMessage("");
         }, 2000);
       }
@@ -153,20 +183,38 @@ const AuthPage = () => {
 
           <Form onSubmit={handleSubmit}>
             {activeTab === "register" && (
-              <InputGroup>
-                <InputIcon>
-                  <FaUser />
-                </InputIcon>
-                <Input
-                  type="text"
-                  name="name"
-                  placeholder="Nome completo"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  error={errors.name}
-                />
-                {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-              </InputGroup>
+              <>
+                <PhotoUpload>
+                  <PhotoPreview $hasImage={!!formData.profilePicture}>
+                    {formData.profilePicture ? (
+                      <img src={formData.profilePicture} alt="Preview" />
+                    ) : (
+                      <FaUser />
+                    )}
+                  </PhotoPreview>
+                  <PhotoLabel>
+                    <FaCamera />
+                    Adicionar Foto (Opcional)
+                    <input type="file" accept="image/*" onChange={handlePhotoChange} />
+                  </PhotoLabel>
+                  {errors.photo && <ErrorMessage>{errors.photo}</ErrorMessage>}
+                </PhotoUpload>
+
+                <InputGroup>
+                  <InputIcon>
+                    <FaUser />
+                  </InputIcon>
+                  <Input
+                    type="text"
+                    name="name"
+                    placeholder="Nome completo"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    error={errors.name}
+                  />
+                  {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
+                </InputGroup>
+              </>
             )}
 
             <InputGroup>
@@ -196,7 +244,7 @@ const AuthPage = () => {
                 onChange={handleInputChange}
                 error={errors.password}
               />
-              <PasswordToggle onClick={() => setShowPassword(!showPassword)}>
+              <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </PasswordToggle>
               {errors.password && (
@@ -218,6 +266,7 @@ const AuthPage = () => {
                   error={errors.confirmPassword}
                 />
                 <PasswordToggle
+                  type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}

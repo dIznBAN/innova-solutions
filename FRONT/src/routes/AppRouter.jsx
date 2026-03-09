@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Home from '../containers/Home'
 import AuthPage from '../pages/Auth'
 import ForgotPasswordPage from '../pages/ForgotPassword'
@@ -7,6 +8,7 @@ import MyCouponsPage from '../pages/MyCoupons'
 import PartnerRegister from '../pages/PartnerRegister'
 import Admin from '../pages/Admin'
 import ProfilePage from '../pages/Profile'
+import TermsOfUse from '../pages/TermsOfUse'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProtectedRoute from '../components/ProtectedRoute'
@@ -16,6 +18,10 @@ import { Container } from './styles'
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderFooter = ['/login', '/registro', '/esqueceu-senha', '/cadastro-parceiro'].includes(location.pathname)
+  
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
   
   return (
     <Container>
@@ -40,6 +46,7 @@ const AppRouter = () => {
           <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/cadastro-parceiro" element={<PartnerRegister />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/termos-de-uso" element={<TermsOfUse />} />
         </Routes>
       </Layout>
     </Router>

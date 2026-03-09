@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Edit3, Save, X, Trash2, User, Calendar, Clock } from 'lucide-react';
+import { AlertTriangle, Edit3, Save, X, Trash2, User, Calendar, Clock, Camera } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
 
@@ -58,7 +58,7 @@ const ProfileAvatar = styled.div`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #CDA09B 0%, #B8918C 100%);
+  background: ${props => props.$hasImage ? 'transparent' : 'linear-gradient(135deg, #CDA09B 0%, #B8918C 100%)'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,6 +69,14 @@ const ProfileAvatar = styled.div`
   flex-shrink: 0;
   box-shadow: 0 8px 25px rgba(205, 160, 155, 0.3);
   border: 4px solid #FFFFFF;
+  position: relative;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   @media (max-width: 768px) {
     width: 80px;
@@ -259,6 +267,93 @@ const CancelButton = styled(motion.button)`
   }
 `;
 
+const PhotoUploadContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const PhotoPreview = styled.div`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: ${props => props.$hasImage ? 'transparent' : 'linear-gradient(135deg, #CDA09B 0%, #B8918C 100%)'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  overflow: hidden;
+  border: 4px solid #E5E7EB;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const PhotoButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const PhotoButton = styled.label`
+  background: #CDA09B;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #B8918C;
+  }
+
+  input {
+    display: none;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+`;
+
+const RemovePhotoButton = styled.button`
+  background: #FF4C4C;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #E53E3E;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+`;
+
 const SkeletonLoader = styled.div`
   .skeleton {
     background: linear-gradient(90deg, #F0F0F0 25%, #E0E0E0 50%, #F0F0F0 75%);
@@ -413,7 +508,8 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    passwordHash: ''
+    passwordHash: '',
+    profilePicture: ''
   });
 
   useEffect(() => {
@@ -421,7 +517,8 @@ const ProfilePage = () => {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        passwordHash: ''
+        passwordHash: '',
+        profilePicture: user.profilePicture || ''
       });
       setIsLoading(false);
     }
@@ -444,8 +541,28 @@ const ProfilePage = () => {
     setFormData({
       name: user.name || '',
       email: user.email || '',
-      passwordHash: ''
+      passwordHash: '',
+      profilePicture: user.profilePicture || ''
     });
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Imagem muito grande. Máximo 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, profilePicture: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setFormData(prev => ({ ...prev, profilePicture: '' }));
   };
 
   const handleSave = async (e) => {
@@ -455,7 +572,8 @@ const ProfilePage = () => {
     try {
       const updateData = {
         name: formData.name,
-        email: formData.email
+        email: formData.email,
+        profilePicture: formData.profilePicture
       };
 
       if (formData.passwordHash.trim()) {
@@ -560,8 +678,12 @@ const ProfilePage = () => {
           transition={{ duration: 0.5 }}
         >
           <ProfileHeader>
-            <ProfileAvatar>
-              {user.name?.charAt(0).toUpperCase() || 'U'}
+            <ProfileAvatar $hasImage={!!user.profilePicture}>
+              {user.profilePicture ? (
+                <img src={user.profilePicture} alt={user.name} />
+              ) : (
+                user.name?.charAt(0).toUpperCase() || 'U'
+              )}
             </ProfileAvatar>
             <ProfileInfo>
               <h1>{user.name}</h1>
@@ -599,6 +721,29 @@ const ProfilePage = () => {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
               >
+                <PhotoUploadContainer>
+                  <PhotoPreview $hasImage={!!formData.profilePicture}>
+                    {formData.profilePicture ? (
+                      <img src={formData.profilePicture} alt="Preview" />
+                    ) : (
+                      formData.name?.charAt(0).toUpperCase() || 'U'
+                    )}
+                  </PhotoPreview>
+                  <PhotoButtons>
+                    <PhotoButton>
+                      <Camera />
+                      Alterar Foto
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} />
+                    </PhotoButton>
+                    {formData.profilePicture && (
+                      <RemovePhotoButton type="button" onClick={handleRemovePhoto}>
+                        <X />
+                        Remover
+                      </RemovePhotoButton>
+                    )}
+                  </PhotoButtons>
+                </PhotoUploadContainer>
+
                 <FormGroup>
                   <Label htmlFor="name">Nome</Label>
                   <Input

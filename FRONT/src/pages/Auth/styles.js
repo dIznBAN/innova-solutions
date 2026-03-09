@@ -85,15 +85,17 @@ export const Form = styled.form`
 
 export const InputGroup = styled.div`
   position: relative;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const InputIcon = styled.div`
   position: absolute;
   left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 1rem;
   color: ${theme.colors.gray};
   z-index: 1;
+  pointer-events: none;
 `;
 
 export const Input = styled.input`
@@ -120,14 +122,15 @@ export const Input = styled.input`
 export const PasswordToggle = styled.button`
   position: absolute;
   right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 1rem;
   background: none;
   border: none;
   color: ${theme.colors.gray};
   cursor: pointer;
   padding: 0.5rem;
   transition: color 0.3s;
+  z-index: 2;
+  type: button;
 
   &:hover {
     color: ${theme.colors.primary};
@@ -220,5 +223,60 @@ export const LogoContainer = styled.div`
 
   @media (max-width: ${theme.breakpoints.mobile}) {
     left: 1rem;
+  }
+`;
+
+export const PhotoUpload = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+export const PhotoPreview = styled.div`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: ${props => props.$hasImage ? 'transparent' : theme.colors.lightGray};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${theme.colors.gray};
+  font-size: 2rem;
+  overflow: hidden;
+  border: 3px solid ${theme.colors.lightGray};
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+export const PhotoLabel = styled.label`
+  background: ${theme.colors.primary};
+  color: ${theme.colors.white};
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${theme.colors.primaryLight};
+    transform: translateY(-1px);
+  }
+
+  input {
+    display: none;
+  }
+
+  svg {
+    font-size: 0.9rem;
   }
 `;

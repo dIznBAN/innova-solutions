@@ -45,8 +45,12 @@ const ProfileDropdown = () => {
           <UserStatus>Conectado</UserStatus>
         </UserInfo>
       )}
-      <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.name : 'Menu do usuário'}>
-        <FaUser />
+      <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.name : 'Menu do usuário'} $hasImage={!!user?.profilePicture}>
+        {isAuthenticated && user?.profilePicture ? (
+          <img src={user.profilePicture} alt={user.name} />
+        ) : (
+          <FaUser />
+        )}
       </ProfileIcon>
       {isOpen && !isAuthenticated && (
         <Dropdown>
