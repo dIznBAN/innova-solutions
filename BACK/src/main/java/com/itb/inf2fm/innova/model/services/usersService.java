@@ -3,6 +3,7 @@ package com.itb.inf2fm.innova.model.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.itb.inf2fm.innova.model.entity.users;
 import com.itb.inf2fm.innova.model.repository.usersRepository;
@@ -10,8 +11,11 @@ import com.itb.inf2fm.innova.model.repository.usersRepository;
 @Service
 public class usersService {
 
-    @Autowired              // Injeção de dependência
+    @Autowired
     private usersRepository usersRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Método responsável em listar todos os Usuarios cadastrados no banco de dados
 
@@ -21,12 +25,17 @@ public class usersService {
 
     // Método responsável em Criar o Usuario no banco de dados
     public users save(users users) {
+        users.setPasswordHash(passwordEncoder.encode(users.getPasswordHash()));
         return usersRepository.save(users);
     }
 
      // Login
-    public users login(String email, String passwordHash) {
-        return usersRepository.findByEmailAndPasswordHash(email, passwordHash);
+    public users login(String email, String rawPassword) {
+        users user = usersRepository.findByEmail(email);
+        if (user != null && passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
+            return user;
+        }
+        return null;
     }
     
     // Verificar se email existe
@@ -47,17 +56,20 @@ public class usersService {
         users usersExistente = findById(id);
         usersExistente.setName(users.getName());
         usersExistente.setEmail(users.getEmail());
-        usersExistente.setPasswordHash(users.getPasswordHash());
+        if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
+            usersExistente.setPasswordHash(passwordEncoder.encode(users.getPasswordHash()));
+        }
         return usersRepository.save(usersExistente);
     }
 
     // Método responsável em excluir a usuario ( exclusão física )
     public void delete(Long id) {
-
-
         users userExistente = findById(id);
         usersRepository.delete(userExistente);
     }
 
-
+    // Verificar senha
+    public boolean checkPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 }

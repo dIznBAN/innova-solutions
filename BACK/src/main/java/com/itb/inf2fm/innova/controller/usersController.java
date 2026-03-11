@@ -110,7 +110,7 @@ public class usersController {
             return ResponseEntity.ok(users);
         }
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Email ou passwordHash incorretos");
+        response.put("message", "Email ou senha incorretos");
         return ResponseEntity.status(401).body(response);
     }
 
@@ -138,9 +138,8 @@ public class usersController {
     public ResponseEntity<Object> atualizarUsuario(@PathVariable String id, @RequestBody users users) {
         try {
             Long usersId = Long.parseLong(id);
-            users usersExistente = usersService.findById(usersId); // já lança exceção se não achar
+            users usersExistente = usersService.findById(usersId);
 
-            // Verifica se o email já existe para outro usuário
             if (!usersExistente.getEmail().equals(users.getEmail()) && usersService.emailExiste(users.getEmail())) {
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Email já cadastrado para outro usuário");
@@ -149,9 +148,11 @@ public class usersController {
 
             usersExistente.setName(users.getName());
             usersExistente.setEmail(users.getEmail());
-            usersExistente.setPasswordHash(users.getPasswordHash());
+            if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
+                usersExistente.setPasswordHash(users.getPasswordHash());
+            }
 
-            users userAtualizada = usersService.save(usersExistente);
+            users userAtualizada = usersService.update(usersId, usersExistente);
 
             return ResponseEntity.ok(userAtualizada);
         } catch (NumberFormatException e) {
@@ -203,9 +204,11 @@ public class usersController {
 
             usersExistente.setName(users.getName());
             usersExistente.setEmail(users.getEmail());
-            usersExistente.setPasswordHash(users.getPasswordHash());
+            if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
+                usersExistente.setPasswordHash(users.getPasswordHash());
+            }
 
-            users userAtualizada = usersService.save(usersExistente);
+            users userAtualizada = usersService.update(usersId, usersExistente);
             return ResponseEntity.ok(userAtualizada);
         } catch (NumberFormatException e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -251,8 +254,7 @@ public class usersController {
             Long usersId = Long.parseLong(id);
             users usuario = usersService.findById(usersId);
             
-            // Verifica se a senha fornecida está correta
-            if (!usuario.getPasswordHash().equals(dados.get("passwordHash"))) {
+            if (!usersService.checkPassword(dados.get("passwordHash"), usuario.getPasswordHash())) {
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Senha incorreta");
                 return ResponseEntity.status(401).body(response);

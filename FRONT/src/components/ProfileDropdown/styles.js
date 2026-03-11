@@ -27,7 +27,7 @@ export const UserName = styled.span`
 
 export const UserStatus = styled.span`
   font-size: 0.75rem;
-  color: ${theme.colors.primary};
+  color: green;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -38,7 +38,7 @@ export const UserStatus = styled.span`
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: ${theme.colors.primary};
+    background: green;
     animation: pulse 2s ease-in-out infinite;
   }
   
