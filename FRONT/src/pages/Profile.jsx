@@ -578,8 +578,6 @@ const ProfilePage = () => {
 
       if (formData.passwordHash.trim()) {
         updateData.passwordHash = formData.passwordHash;
-      } else {
-        updateData.passwordHash = user.passwordHash;
       }
 
       const updatedUser = await apiService.updateProfile(user.id, updateData);

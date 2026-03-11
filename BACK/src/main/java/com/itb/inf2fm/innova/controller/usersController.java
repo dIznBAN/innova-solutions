@@ -204,6 +204,7 @@ public class usersController {
 
             usersExistente.setName(users.getName());
             usersExistente.setEmail(users.getEmail());
+            usersExistente.setProfilePicture(users.getProfilePicture());
             if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
                 usersExistente.setPasswordHash(users.getPasswordHash());
             }

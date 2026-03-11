@@ -56,6 +56,7 @@ public class usersService {
         users usersExistente = findById(id);
         usersExistente.setName(users.getName());
         usersExistente.setEmail(users.getEmail());
+        usersExistente.setProfilePicture(users.getProfilePicture());
         if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
             usersExistente.setPasswordHash(passwordEncoder.encode(users.getPasswordHash()));
         }
