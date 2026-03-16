@@ -41,13 +41,13 @@ const ProfileDropdown = () => {
     <Container ref={dropdownRef}>
       {isAuthenticated && (
         <UserInfo>
-          <UserName>{user?.name}</UserName>
+          <UserName>{user?.displayName}</UserName>
           <UserStatus>Conectado</UserStatus>
         </UserInfo>
       )}
-      <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.name : 'Menu do usuário'} $hasImage={!!user?.profilePicture}>
-        {isAuthenticated && user?.profilePicture ? (
-          <img src={user.profilePicture} alt={user.name} />
+      <ProfileIcon onClick={() => setIsOpen(!isOpen)} title={isAuthenticated ? user?.displayName : 'Menu do usuário'} $hasImage={!!user?.photoURL}>
+        {isAuthenticated && user?.photoURL ? (
+          <img src={user.photoURL} alt={user.displayName} />
         ) : (
           <FaUser />
         )}

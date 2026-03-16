@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaCamera } from "react-icons/fa";
-import ApiService from "../../services/api";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../../services/firebase';
 import { useAuth } from "../../hooks/useAuth.jsx";
 import {
   Container,
@@ -28,7 +29,7 @@ import { Logo } from "../../components/Header/styles";
 const AuthPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
   const [loading, setLoading] = useState(false);
 
@@ -113,6 +114,15 @@ const AuthPage = () => {
     return newErrors;
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate('/');
+    } catch (error) {
+      setErrors({ general: 'Erro ao entrar com Google. Tente novamente.' });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
@@ -128,27 +138,38 @@ const AuthPage = () => {
 
     try {
       if (activeTab === "login") {
-        const user = await ApiService.login(formData.email, formData.password);
+        const result = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        if (!result.user.emailVerified) {
+          await auth.signOut();
+          setErrors({ general: 'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.' });
+          return;
+        }
         setSuccessMessage("Login realizado com sucesso!");
-        authLogin(user);
         setTimeout(() => navigate('/'), 1500);
       } else {
-        const userData = {
-          name: formData.name,
-          email: formData.email,
-          passwordHash: formData.password,
-          profilePicture: formData.profilePicture || null
-        };
-        await ApiService.register(userData);
-        setSuccessMessage("Conta criada com sucesso! Faça login para continuar.");
+        const { user } = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        await updateProfile(user, {
+          displayName: formData.name,
+          photoURL: formData.profilePicture || null
+        });
+        await sendEmailVerification(user);
+        await auth.signOut();
+        setSuccessMessage("Conta criada! Verifique seu e-mail para confirmar antes de entrar.");
         setTimeout(() => {
           setActiveTab("login");
           setFormData({ name: "", email: "", password: "", confirmPassword: "", profilePicture: "" });
           setSuccessMessage("");
-        }, 2000);
+        }, 3000);
       }
     } catch (error) {
-      setErrors({ general: error.message });
+      const messages = {
+        'auth/user-not-found': 'Usuário não encontrado',
+        'auth/wrong-password': 'Senha incorreta',
+        'auth/email-already-in-use': 'E-mail já cadastrado',
+        'auth/invalid-credential': 'E-mail ou senha incorretos',
+        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde',
+      };
+      setErrors({ general: messages[error.code] || error.message });
     } finally {
       setLoading(false);
     }
@@ -286,6 +307,13 @@ const AuthPage = () => {
                 Esqueceu a senha?
               </ForgotPassword>
             )}
+
+            <div style={{ textAlign: 'center', margin: '0.5rem 0', color: '#999', fontSize: '0.85rem' }}>ou</div>
+
+            <SubmitButton type="button" onClick={handleGoogleLogin} style={{ background: '#fff', color: '#444', border: '1px solid #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" />
+              Continuar com Google
+            </SubmitButton>
           </Form>
         </FormContainer>
       </AuthCard>

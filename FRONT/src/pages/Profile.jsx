@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../services/api';
+import { updateProfile, updateEmail, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { auth } from '../services/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Edit3, Save, X, Trash2, User, Calendar, Clock, Camera } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -496,7 +497,7 @@ const ModalContent = styled(motion.div)`
 `;
 
 const ProfilePage = () => {
-  const { user, login, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -515,10 +516,10 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || '',
+        name: user.displayName || '',
         email: user.email || '',
         passwordHash: '',
-        profilePicture: user.profilePicture || ''
+        profilePicture: user.photoURL || ''
       });
       setIsLoading(false);
     }
@@ -570,23 +571,27 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      const updateData = {
-        name: formData.name,
-        email: formData.email,
-        profilePicture: formData.profilePicture
-      };
+      await updateProfile(auth.currentUser, {
+        displayName: formData.name,
+        photoURL: formData.profilePicture || null
+      });
 
-      if (formData.passwordHash.trim()) {
-        updateData.passwordHash = formData.passwordHash;
+      if (formData.email !== user.email) {
+        await updateEmail(auth.currentUser, formData.email);
       }
 
-      const updatedUser = await apiService.updateProfile(user.id, updateData);
-      login(updatedUser);
+      if (formData.passwordHash.trim()) {
+        await updatePassword(auth.currentUser, formData.passwordHash);
+      }
+
       setIsEditing(false);
       toast.success('Perfil atualizado com sucesso!');
-      
     } catch (error) {
-      toast.error(error.message || 'Erro ao atualizar perfil');
+      if (error.code === 'auth/requires-recent-login') {
+        toast.error('Por segurança, faça login novamente antes de alterar email ou senha.');
+      } else {
+        toast.error(error.message || 'Erro ao atualizar perfil');
+      }
     } finally {
       setLoading(false);
     }
@@ -601,12 +606,17 @@ const ProfilePage = () => {
     setDeleteLoading(true);
 
     try {
-      await apiService.deleteAccount(user.id, deletePassword);
+      const credential = EmailAuthProvider.credential(user.email, deletePassword);
+      await reauthenticateWithCredential(auth.currentUser, credential);
+      await deleteUser(auth.currentUser);
       toast.success('Conta excluída com sucesso');
-      logout();
-      navigate('/auth');
+      navigate('/');
     } catch (error) {
-      toast.error(error.message || 'Erro ao excluir conta');
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        toast.error('Senha incorreta');
+      } else {
+        toast.error(error.message || 'Erro ao excluir conta');
+      }
       setShowDeleteModal(false);
       setDeletePassword('');
     } finally {
@@ -676,24 +686,24 @@ const ProfilePage = () => {
           transition={{ duration: 0.5 }}
         >
           <ProfileHeader>
-            <ProfileAvatar $hasImage={!!user.profilePicture}>
-              {user.profilePicture ? (
-                <img src={user.profilePicture} alt={user.name} />
+            <ProfileAvatar $hasImage={!!user.photoURL}>
+              {user.photoURL ? (
+                <img src={user.photoURL} alt={user.displayName} />
               ) : (
-                user.name?.charAt(0).toUpperCase() || 'U'
+                user.displayName?.charAt(0).toUpperCase() || 'U'
               )}
             </ProfileAvatar>
             <ProfileInfo>
-              <h1>{user.name}</h1>
+              <h1>{user.displayName}</h1>
               <p className="email">{user.email}</p>
               <InfoGrid>
                 <InfoItem>
                   <Calendar />
-                  <span>Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}</span>
+                  <span>Membro desde {user.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('pt-BR') : '-'}</span>
                 </InfoItem>
                 <InfoItem>
                   <Clock />
-                  <span>Atualizado em {user.updated_at ? new Date(user.updated_at).toLocaleDateString('pt-BR') : 'Nunca'}</span>
+                  <span>Último acesso: {user.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString('pt-BR') : '-'}</span>
                 </InfoItem>
               </InfoGrid>
             </ProfileInfo>

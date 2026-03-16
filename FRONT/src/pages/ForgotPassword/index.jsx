@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../../services/firebase'
 import { FaEnvelope, FaArrowLeft } from 'react-icons/fa'
 import { Container, Card, Title, Form, InputGroup, InputIcon, Input, SubmitButton, BackLink, SuccessMessage } from './styles'
 
@@ -7,14 +9,11 @@ const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (email) {
+      await sendPasswordResetEmail(auth, email)
       setIsSubmitted(true)
-      setTimeout(() => {
-        setIsSubmitted(false)
-        setEmail('')
-      }, 5000)
     }
   }
 
