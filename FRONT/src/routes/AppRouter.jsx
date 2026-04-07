@@ -12,6 +12,7 @@ import TermsOfUse from '../pages/TermsOfUse'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProtectedRoute from '../components/ProtectedRoute'
+import AdminRoute from '../components/AdminRoute'
 import { Container } from './styles'
 
 // Componente para controlar quando mostrar Header e Footer
@@ -45,7 +46,7 @@ const AppRouter = () => {
           <Route path="/esqueceu-senha" element={<ForgotPasswordPage />} />
           <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/cadastro-parceiro" element={<PartnerRegister />} />
-          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
           <Route path="/termos-de-uso" element={<TermsOfUse />} />
         </Routes>
       </Layout>

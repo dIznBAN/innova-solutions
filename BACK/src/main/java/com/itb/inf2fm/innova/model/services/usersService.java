@@ -1,12 +1,11 @@
 package com.itb.inf2fm.innova.model.services;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.itb.inf2fm.innova.model.entity.users;
 import com.itb.inf2fm.innova.model.repository.usersRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
 @Service
 public class usersService {
@@ -14,63 +13,46 @@ public class usersService {
     @Autowired
     private usersRepository usersRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    // Método responsável em listar todos os Usuarios cadastrados no banco de dados
-
     public List<users> findAll() {
         return usersRepository.findAll();
     }
 
-    // Método responsável em Criar o Usuario no banco de dados
-    public users save(users users) {
-        users.setPasswordHash(passwordEncoder.encode(users.getPasswordHash()));
-        return usersRepository.save(users);
+    public users save(users user) {
+        return usersRepository.save(user);
     }
-
-     // Login
-    public users login(String email, String rawPassword) {
-        users user = usersRepository.findByEmail(email);
-        if (user != null && passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
-            return user;
-        }
-        return null;
-    }
-    
-    // Verificar se email existe
-    public boolean emailExiste(String email) {
-        return usersRepository.existsByEmail(email);
-    }
-
-
-    // Método responsável em listar o usuario por id
 
     public users findById(Long id) {
         return usersRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario não encontrado" + id));
+            .orElseThrow(() -> new RuntimeException("Usuario não encontrado: " + id));
     }
 
-    // Método responsável em atualizar usuario
-    public users update(Long id, users users) {
-        users usersExistente = findById(id);
-        usersExistente.setName(users.getName());
-        usersExistente.setEmail(users.getEmail());
-        usersExistente.setProfilePicture(users.getProfilePicture());
-        if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
-            usersExistente.setPasswordHash(passwordEncoder.encode(users.getPasswordHash()));
-        }
-        return usersRepository.save(usersExistente);
+    public users findByFirebaseUid(String firebaseUid) {
+        return usersRepository.findByFirebaseUid(firebaseUid);
     }
 
-    // Método responsável em excluir a usuario ( exclusão física )
+    public boolean firebaseUidExiste(String firebaseUid) {
+        return usersRepository.existsByFirebaseUid(firebaseUid);
+    }
+
+    public users update(Long id, users user) {
+        users existente = findById(id);
+        existente.setName(user.getName());
+        existente.setEmail(user.getEmail());
+        existente.setProfilePicture(user.getProfilePicture());
+        return usersRepository.save(existente);
+    }
+
+    public users updateRole(Long id, String role) {
+        users existente = findById(id);
+        existente.setRole(role);
+        return usersRepository.save(existente);
+    }
+
     public void delete(Long id) {
-        users userExistente = findById(id);
-        usersRepository.delete(userExistente);
-    }
-
-    // Verificar senha
-    public boolean checkPassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+        users user = findById(id);
+        try {
+            FirebaseAuth.getInstance().deleteUser(user.getFirebaseUid());
+        } catch (Exception ignored) {}
+        usersRepository.delete(user);
     }
 }

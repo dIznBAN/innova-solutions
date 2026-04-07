@@ -6,6 +6,6 @@ import com.itb.inf2fm.innova.model.entity.users;
 
 @Repository
 public interface usersRepository extends JpaRepository<users, Long> {
-    users findByEmail(String email);
-    boolean existsByEmail(String email);
+    users findByFirebaseUid(String firebaseUid);
+    boolean existsByFirebaseUid(String firebaseUid);
 }

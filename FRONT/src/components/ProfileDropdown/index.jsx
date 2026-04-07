@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { FaUser, FaSignOutAlt, FaTicketAlt } from 'react-icons/fa'
+import { FaUser, FaSignOutAlt, FaTicketAlt, FaUserShield } from 'react-icons/fa'
 import { useClickOutside } from '../../hooks/useClickOutside'
 import { useAuth } from '../../hooks/useAuth.jsx'
 import { Container, ProfileIcon, Dropdown, DropdownItem, UserInfo, UserName, UserStatus } from './styles'
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, user, dbUser, logout } = useAuth()
   const navigate = useNavigate()
   const dropdownRef = useClickOutside(() => setIsOpen(false))
 
@@ -60,6 +60,12 @@ const ProfileDropdown = () => {
       )}
       {isOpen && isAuthenticated && (
         <Dropdown>
+          {dbUser?.role === 'ADMIN' && (
+            <DropdownItem onClick={() => { setIsOpen(false); navigate('/admin'); }}>
+              <FaUserShield style={{ marginRight: '8px' }} />
+              Painel Administrativo
+            </DropdownItem>
+          )}
           <DropdownItem onClick={() => { setIsOpen(false); navigate('/perfil'); }}>Meu Perfil</DropdownItem>
           <DropdownItem onClick={() => { setIsOpen(false); navigate('/meus-cupons'); }}>
             <FaTicketAlt style={{ marginRight: '8px' }} />

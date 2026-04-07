@@ -1,25 +1,15 @@
 package com.itb.inf2fm.innova.controller;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import com.itb.inf2fm.innova.model.entity.users;
 import com.itb.inf2fm.innova.model.services.usersService;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// No spring é comum adicionarmos anotações (annotation) em classes, atributos e métodos
-// Uma annotation é uma forma de adicionar informações (metadados) ao seu código que podem
-// ser interpretadas pelo compilador ou em tempo de execução por ferramentas e frameworks
-// como o Spring
-// Uma annotation é uma palavra iniciada com '@' que você coloca acima de uma class, método,
-// atributo ou parâmetro, para dar instruções extras ao Java ou a algum framework sobre como
-// aquele elemento deve ser tratado.
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,17 +20,8 @@ public class usersController {
     private usersService usersService;
 
     @GetMapping
-    public ResponseEntity<List<users>> getAllUsers() {
-        return ResponseEntity.ok(usersService.findAll());
-    }
-
-    @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("API funcionando! Servidor ativo em: " + java.time.LocalDateTime.now());
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<List<users>> listar() {
+    public ResponseEntity<List<users>> getAll(HttpServletRequest request) {
+        if (!isAdmin(request)) return ResponseEntity.status(403).build();
         return ResponseEntity.ok(usersService.findAll());
     }
 
@@ -49,235 +30,108 @@ public class usersController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("timestamp", java.time.LocalDateTime.now());
-        response.put("service", "FashionSpace API");
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/findAll")
-    public ResponseEntity<List<users>> findAll() {
-
-        return ResponseEntity.ok(usersService.findAll());
-    }
-
-    // @RequestBody : Corpo da Requisição ( Recebendo um objeto JSON )
-    // RespondeEntity: Toda resposta HTTP (status, cabeçalhos e corpo), aqui temos
-    // mais controle sobre o que é devolvido para o cliente
-    // 1. Status HTTP ( 200 ok, 201 CREATED, 404 NOT FOUND etc...)
-    // 2. Headers: ( cabeçalhos extras, como Location, Authorization etc...)
-    // 3. Body: ( o objeto que será convertido em JSON/XML para o cliente )
-
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody users users) {
-        if (usersService.emailExiste(users.getEmail())) {
+    public ResponseEntity<Object> create(@RequestBody users user) {
+        if (usersService.firebaseUidExiste(user.getFirebaseUid())) {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Email já cadastrado");
+            response.put("message", "Usuário já cadastrado");
             return ResponseEntity.badRequest().body(response);
         }
-        
-        String passwordError = validatePassword(users.getPasswordHash());
-        if (passwordError != null) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", passwordError);
-            return ResponseEntity.badRequest().body(response);
-        }
-        
-        return ResponseEntity.ok(usersService.save(users));
-    }
-    
-    private String validatePassword(String password) {
-        if (password == null || password.length() < 8) {
-            return "A senha deve ter no mínimo 8 caracteres";
-        }
-        if (!password.matches(".*[A-Z].*")) {
-            return "A senha deve conter pelo menos uma letra maiúscula";
-        }
-        if (!password.matches(".*[a-z].*")) {
-            return "A senha deve conter pelo menos uma letra minúscula";
-        }
-        if (!password.matches(".*\\d.*")) {
-            return "A senha deve conter pelo menos um número";
-        }
-        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
-            return "A senha deve conter pelo menos um caractere especial";
-        }
-        return null;
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody Map<String, String> dados) {
-        users users = usersService.login(dados.get("email"), dados.get("passwordHash"));
-        if (users != null) {
-            return ResponseEntity.ok(users);
-        }
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Email ou senha incorretos");
-        return ResponseEntity.status(401).body(response);
+        return ResponseEntity.ok(usersService.save(user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> listarUsuarioPorId(@PathVariable String id) {
+    public ResponseEntity<Object> getById(@PathVariable String id) {
         try {
             return ResponseEntity.ok(usersService.findById(Long.parseLong(id)));
         } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
-
+            return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrada com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
+            return notFound("Usuario não encontrado com o id " + id);
         }
+    }
+
+    @GetMapping("/firebase/{uid}")
+    public ResponseEntity<Object> getByFirebaseUid(@PathVariable String uid) {
+        users user = usersService.findByFirebaseUid(uid);
+        if (user == null) return notFound("Usuario não encontrado com o uid " + uid);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> atualizarUsuario(@PathVariable String id, @RequestBody users users) {
+    public ResponseEntity<Object> update(@PathVariable String id, @RequestBody users user) {
         try {
-            Long usersId = Long.parseLong(id);
-            users usersExistente = usersService.findById(usersId);
-
-            if (!usersExistente.getEmail().equals(users.getEmail()) && usersService.emailExiste(users.getEmail())) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "Email já cadastrado para outro usuário");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            usersExistente.setName(users.getName());
-            usersExistente.setEmail(users.getEmail());
-            if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
-                usersExistente.setPasswordHash(users.getPasswordHash());
-            }
-
-            users userAtualizada = usersService.update(usersId, usersExistente);
-
-            return ResponseEntity.ok(userAtualizada);
+            return ResponseEntity.ok(usersService.update(Long.parseLong(id), user));
         } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
-
+            return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrada com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
-        }
-    }
-
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<Object> getProfile(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(usersService.findById(Long.parseLong(id)));
-        } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrado com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
-        }
-    }
-
-    @PutMapping("/profile/{id}")
-    public ResponseEntity<Object> updateProfile(@PathVariable String id, @RequestBody users users) {
-        try {
-            Long usersId = Long.parseLong(id);
-            users usersExistente = usersService.findById(usersId);
-
-            if (!usersExistente.getEmail().equals(users.getEmail()) && usersService.emailExiste(users.getEmail())) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "Email já cadastrado para outro usuário");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            usersExistente.setName(users.getName());
-            usersExistente.setEmail(users.getEmail());
-            usersExistente.setProfilePicture(users.getProfilePicture());
-            if (users.getPasswordHash() != null && !users.getPasswordHash().isEmpty()) {
-                usersExistente.setPasswordHash(users.getPasswordHash());
-            }
-
-            users userAtualizada = usersService.update(usersId, usersExistente);
-            return ResponseEntity.ok(userAtualizada);
-        } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrado com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
+            return notFound("Usuario não encontrado com o id " + id);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> excluirUsuario(@PathVariable String id) {
+    public ResponseEntity<Object> delete(@PathVariable String id, HttpServletRequest request) {
+        String requesterUid = (String) request.getAttribute("firebaseUid");
+        if (requesterUid == null) return ResponseEntity.status(403).build();
+
         try {
-            Long usersId = Long.parseLong(id);
-            usersService.delete(usersId); // chama o service
+            Long userId = Long.parseLong(id);
+            users target = usersService.findById(userId);
+
+            boolean isAdmin = isAdmin(request);
+            boolean isSelf = target.getFirebaseUid().equals(requesterUid);
+
+            if (!isAdmin && !isSelf) return ResponseEntity.status(403).build();
+
+            usersService.delete(userId);
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Usuario deletada com sucesso");
+            response.put("message", "Usuario deletado com sucesso");
             return ResponseEntity.ok(response);
         } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
+            return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrada com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
+            return notFound("Usuario não encontrado com o id " + id);
         }
     }
 
-    @DeleteMapping("/account/{id}")
-    public ResponseEntity<Object> excluirPropriaConta(@PathVariable String id, @RequestBody Map<String, String> dados) {
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<Object> updateRole(@PathVariable String id, @RequestBody Map<String, String> body, HttpServletRequest request) {
+        if (!isAdmin(request)) return ResponseEntity.status(403).build();
         try {
-            Long usersId = Long.parseLong(id);
-            users usuario = usersService.findById(usersId);
-            
-            if (!usersService.checkPassword(dados.get("passwordHash"), usuario.getPasswordHash())) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "Senha incorreta");
-                return ResponseEntity.status(401).body(response);
-            }
-            
-            usersService.delete(usersId);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Conta excluída com sucesso");
-            return ResponseEntity.ok(response);
+            String newRole = body.get("role");
+            if (newRole == null || (!newRole.equals("ADMIN") && !newRole.equals("USER")))
+                return badRequest("Role inválido. Use ADMIN ou USER");
+            return ResponseEntity.ok(usersService.updateRole(Long.parseLong(id), newRole));
         } catch (NumberFormatException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 400);
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", "O id informado não é válido: " + id);
-            return ResponseEntity.badRequest().body(errorResponse);
+            return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 404);
-            errorResponse.put("error", "Not Found");
-            errorResponse.put("message", "Usuario não encontrado com o id " + id);
-            return ResponseEntity.status(404).body(errorResponse);
+            return notFound("Usuario não encontrado com o id " + id);
         }
     }
 
+    private boolean isAdmin(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        if (uid == null) return false;
+        users u = usersService.findByFirebaseUid(uid);
+        return u != null && "ADMIN".equals(u.getRole());
+    }
+
+    private ResponseEntity<Object> badRequest(String message) {
+        Map<String, Object> err = new HashMap<>();
+        err.put("status", 400);
+        err.put("error", "Bad Request");
+        err.put("message", message);
+        return ResponseEntity.badRequest().body(err);
+    }
+
+    private ResponseEntity<Object> notFound(String message) {
+        Map<String, Object> err = new HashMap<>();
+        err.put("status", 404);
+        err.put("error", "Not Found");
+        err.put("message", message);
+        return ResponseEntity.status(404).body(err);
+    }
 }

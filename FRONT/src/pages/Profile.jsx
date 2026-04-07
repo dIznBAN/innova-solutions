@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { updateProfile, updateEmail, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Edit3, Save, X, Trash2, User, Calendar, Clock, Camera } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -497,7 +498,7 @@ const ModalContent = styled(motion.div)`
 `;
 
 const ProfilePage = () => {
-  const { user, logout } = useAuth();
+  const { user, dbUser, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -540,10 +541,11 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setIsEditing(false);
     setFormData({
-      name: user.name || '',
+      name: user.displayName || '',
       email: user.email || '',
       passwordHash: '',
-      profilePicture: user.profilePicture || ''
+      profilePicture: user.photoURL || '',
+      profilePictureFile: null
     });
   };
 
@@ -554,16 +556,29 @@ const ProfilePage = () => {
         toast.error('Imagem muito grande. Máximo 5MB');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, profilePicture: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, profilePicture: previewUrl, profilePictureFile: file }));
     }
   };
 
+  const uploadToImgBB = async (file) => {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const body = new URLSearchParams();
+    body.append('key', '06e7312be7cd16b207344fba43e96449');
+    body.append('image', base64);
+    const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body });
+    const data = await res.json();
+    if (!data.success) throw new Error('Falha ao fazer upload da imagem');
+    return data.data.url;
+  };
+
   const handleRemovePhoto = () => {
-    setFormData(prev => ({ ...prev, profilePicture: '' }));
+    setFormData(prev => ({ ...prev, profilePicture: '', profilePictureFile: null }));
   };
 
   const handleSave = async (e) => {
@@ -571,9 +586,13 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
+      let photoURL = formData.profilePicture || null;
+      if (formData.profilePictureFile) {
+        photoURL = await uploadToImgBB(formData.profilePictureFile);
+      }
       await updateProfile(auth.currentUser, {
         displayName: formData.name,
-        photoURL: formData.profilePicture || null
+        photoURL
       });
 
       if (formData.email !== user.email) {
@@ -608,6 +627,7 @@ const ProfilePage = () => {
     try {
       const credential = EmailAuthProvider.credential(user.email, deletePassword);
       await reauthenticateWithCredential(auth.currentUser, credential);
+      if (dbUser?.id) await api.deleteUser(dbUser.id);
       await deleteUser(auth.currentUser);
       toast.success('Conta excluída com sucesso');
       navigate('/');

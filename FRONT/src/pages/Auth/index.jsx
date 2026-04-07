@@ -4,6 +4,7 @@ import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaCamera } from "react-i
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../services/firebase';
 import { useAuth } from "../../hooks/useAuth.jsx";
+import api from '../../services/api';
 import {
   Container,
   AuthCard,
@@ -67,13 +68,29 @@ const AuthPage = () => {
         setErrors((prev) => ({ ...prev, photo: "Imagem muito grande. Máximo 5MB" }));
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, profilePicture: reader.result }));
-        setErrors((prev) => ({ ...prev, photo: "" }));
-      };
-      reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, profilePicture: previewUrl, profilePictureFile: file }));
+      setErrors((prev) => ({ ...prev, photo: "" }));
     }
+  };
+
+  const uploadToImgBB = async (file) => {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const body = new URLSearchParams();
+    body.append('key', '06e7312be7cd16b207344fba43e96449');
+    body.append('image', base64);
+    const res = await fetch('https://api.imgbb.com/1/upload', {
+      method: 'POST',
+      body,
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error('Falha ao fazer upload da imagem');
+    return data.data.url;
   };
 
   const validateForm = () => {
@@ -116,7 +133,10 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      const { uid, displayName, email, photoURL } = result.user;
+      const exists = await api.getUserByFirebaseUid(uid).catch(() => null);
+      if (!exists) await api.createUser(uid, displayName || 'Usuário', email, photoURL);
       navigate('/');
     } catch (error) {
       setErrors({ general: 'Erro ao entrar com Google. Tente novamente.' });
@@ -148,16 +168,18 @@ const AuthPage = () => {
         setTimeout(() => navigate('/'), 1500);
       } else {
         const { user } = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        await updateProfile(user, {
-          displayName: formData.name,
-          photoURL: formData.profilePicture || null
-        });
+        let photoURL = null;
+        if (formData.profilePictureFile) {
+          photoURL = await uploadToImgBB(formData.profilePictureFile);
+        }
+        await updateProfile(user, { displayName: formData.name, photoURL });
+        await api.createUser(user.uid, formData.name, formData.email, photoURL);
         await sendEmailVerification(user);
         await auth.signOut();
         setSuccessMessage("Conta criada! Verifique seu e-mail para confirmar antes de entrar.");
         setTimeout(() => {
           setActiveTab("login");
-          setFormData({ name: "", email: "", password: "", confirmPassword: "", profilePicture: "" });
+          setFormData({ name: "", email: "", password: "", confirmPassword: "", profilePicture: "", profilePictureFile: null });
           setSuccessMessage("");
         }, 3000);
       }

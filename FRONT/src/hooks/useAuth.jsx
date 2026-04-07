@@ -1,16 +1,24 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [dbUser, setDbUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      if (firebaseUser) {
+        const profile = await api.getUserByFirebaseUid(firebaseUser.uid).catch(() => null);
+        setDbUser(profile);
+      } else {
+        setDbUser(null);
+      }
       setLoading(false);
     });
     return unsubscribe;
@@ -19,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, dbUser, logout, loading, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );
