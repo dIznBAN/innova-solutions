@@ -173,7 +173,10 @@ const AuthPage = () => {
           photoURL = await uploadToImgBB(formData.profilePictureFile);
         }
         await updateProfile(user, { displayName: formData.name, photoURL });
-        await api.createUser(user.uid, formData.name, formData.email, photoURL);
+        const token = await user.getIdToken();
+        await api.createUserWithToken(token, user.uid, formData.name, formData.email, photoURL).catch((err) => {
+          if (!err.message?.includes('já cadastrado')) throw err;
+        });
         await sendEmailVerification(user);
         await auth.signOut();
         setSuccessMessage("Conta criada! Verifique seu e-mail para confirmar antes de entrar.");
@@ -207,13 +210,13 @@ const AuthPage = () => {
       <AuthCard>
         <TabContainer>
           <Tab
-            active={activeTab === "login"}
+            $active={activeTab === "login"}
             onClick={() => setActiveTab("login")}
           >
             Entrar
           </Tab>
           <Tab
-            active={activeTab === "register"}
+            $active={activeTab === "register"}
             onClick={() => setActiveTab("register")}
           >
             Criar Conta

@@ -45,9 +45,9 @@ export const Tab = styled.button`
   flex: 1;
   padding: 1.5rem;
   border: none;
-  background: ${(props) => (props.active ? theme.colors.white : "transparent")};
+  background: ${(props) => (props.$active ? theme.colors.white : "transparent")};
   color: ${(props) =>
-    props.active ? theme.colors.primary : theme.colors.gray};
+    props.$active ? theme.colors.primary : theme.colors.gray};
   font-weight: 600;
   font-size: 1.1rem;
   cursor: pointer;
@@ -55,7 +55,7 @@ export const Tab = styled.button`
   position: relative;
 
   ${(props) =>
-    props.active &&
+    props.$active &&
     `
     &::after {
       content: '';

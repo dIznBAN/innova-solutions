@@ -7,7 +7,7 @@ class ApiService {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = { 'Content-Type': 'application/json', ...options.headers };
 
-    if (auth.currentUser) {
+    if (auth.currentUser && !headers['Authorization']) {
       const token = await auth.currentUser.getIdToken();
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -23,6 +23,14 @@ class ApiService {
   async createUser(firebaseUid, name, email, profilePicture) {
     return this.request('/users', {
       method: 'POST',
+      body: JSON.stringify({ firebaseUid, name, email, profilePicture: profilePicture || null }),
+    });
+  }
+
+  async createUserWithToken(token, firebaseUid, name, email, profilePicture) {
+    return this.request('/users', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ firebaseUid, name, email, profilePicture: profilePicture || null }),
     });
   }
