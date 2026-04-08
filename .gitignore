@@ -1,0 +1,9 @@
+node_modules/
+FRONT/node_modules/
+BACK/target/
+.env
+*.env.local
+serviceAccountKey.json
+BACK/src/main/resources/serviceAccountKey.json
+node_modules
+node_modules
