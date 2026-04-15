@@ -27,6 +27,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
                     String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
                     Map<?, ?> claims = new ObjectMapper().readValue(payload, Map.class);
                     String uid = (String) claims.get("user_id");
+                    if (uid == null) uid = (String) claims.get("sub");
                     if (uid != null) request.setAttribute("firebaseUid", uid);
                 }
             } catch (Exception ignored) {}

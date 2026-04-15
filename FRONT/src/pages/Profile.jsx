@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile, updateEmail, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { updateProfile, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -498,7 +498,7 @@ const ModalContent = styled(motion.div)`
 `;
 
 const ProfilePage = () => {
-  const { user, dbUser, logout } = useAuth();
+  const { user, dbUser, setDbUser, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -509,7 +509,6 @@ const ProfilePage = () => {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     passwordHash: '',
     profilePicture: ''
   });
@@ -518,7 +517,6 @@ const ProfilePage = () => {
     if (user) {
       setFormData({
         name: user.displayName || '',
-        email: user.email || '',
         passwordHash: '',
         profilePicture: user.photoURL || ''
       });
@@ -542,7 +540,6 @@ const ProfilePage = () => {
     setIsEditing(false);
     setFormData({
       name: user.displayName || '',
-      email: user.email || '',
       passwordHash: '',
       profilePicture: user.photoURL || '',
       profilePictureFile: null
@@ -595,12 +592,16 @@ const ProfilePage = () => {
         photoURL
       });
 
-      if (formData.email !== user.email) {
-        await updateEmail(auth.currentUser, formData.email);
-      }
-
       if (formData.passwordHash.trim()) {
         await updatePassword(auth.currentUser, formData.passwordHash);
+      }
+
+      if (dbUser?.id) {
+        await api.updateUser(dbUser.id, {
+          name: formData.name,
+          email: user.email,
+          profilePicture: photoURL || null
+        });
       }
 
       setIsEditing(false);
@@ -779,18 +780,6 @@ const ProfilePage = () => {
                     id="name"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
                     onChange={handleInputChange}
                     required
                   />

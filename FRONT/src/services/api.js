@@ -41,6 +41,22 @@ class ApiService {
   async updateUser(id, userData) { return this.request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(userData) }); }
   async updateUserRole(id, role) { return this.request(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }); }
   async deleteUser(id) { return this.request(`/users/${id}`, { method: 'DELETE' }); }
+
+  async registerPartner(data) {
+    return this.request('/stores/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getAllStores() { return this.request('/stores'); }
+  async getStoreById(id) { return this.request(`/stores/${id}`); }
+  async updateStoreStatus(id, status, rejectionReason = null) {
+    return this.request(`/stores/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, rejectionReason }),
+    })
+  }
 }
 
 export default new ApiService();

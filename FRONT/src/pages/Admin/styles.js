@@ -96,8 +96,8 @@ export const Tab = styled.button`
   flex: 1;
   padding: 0.75rem 1.5rem;
   border: none;
-  background: ${props => props.active ? theme.colors.primary : 'transparent'};
-  color: ${props => props.active ? theme.colors.white : theme.colors.gray};
+  background: ${props => props.$active ? theme.colors.primary : 'transparent'};
+  color: ${props => props.$active ? theme.colors.white : theme.colors.gray};
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.9rem;
@@ -105,8 +105,8 @@ export const Tab = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    color: ${props => props.active ? theme.colors.white : theme.colors.primary};
-    background: ${props => props.active ? theme.colors.primary : theme.colors.secondary};
+    color: ${props => props.$active ? theme.colors.white : theme.colors.primary};
+    background: ${props => props.$active ? theme.colors.primary : theme.colors.secondary};
   }
 `
 
@@ -213,24 +213,26 @@ export const Badge = styled.span`
   font-size: 0.78rem;
   font-weight: 600;
 
-  ${props => props.variant === 'active' && `
+  ${props => props.$variant === 'active' && `
     background: #E8F5E9;
     color: #2E7D32;
   `}
-  ${props => props.variant === 'pending' && `
-    background: #FFF8E1;
-    color: #F57F17;
+  ${props => props.$variant === 'pending' && `
+    background: #EEEEEE;
+    color: #616161;
+    border: 1px solid #BDBDBD;
+    text-transform: capitalize;
   `}
-  ${props => props.variant === 'inactive' && `
+  ${props => props.$variant === 'inactive' && `
     background: #FAFAFA;
     color: #757575;
     border: 1px solid #E0E0E0;
   `}
-  ${props => props.variant === 'admin' && `
+  ${props => props.$variant === 'admin' && `
     background: ${theme.colors.secondary};
     color: ${theme.colors.primary};
   `}
-  ${props => props.variant === 'user' && `
+  ${props => props.$variant === 'user' && `
     background: #F5F5F5;
     color: #757575;
   `}
@@ -257,19 +259,19 @@ export const ActionButton = styled.button`
   gap: 0.35rem;
   white-space: nowrap;
 
-  ${props => props.approve && `
+  ${props => props.$approve && `
     background: ${theme.colors.secondary};
     color: ${theme.colors.primary};
     &:hover { background: ${theme.colors.primaryLight}; color: white; transform: translateY(-1px); }
   `}
 
-  ${props => props.reject && `
+  ${props => props.$reject && `
     background: #FFEBEE;
     color: #C62828;
     &:hover { background: #C62828; color: white; transform: translateY(-1px); }
   `}
 
-  ${props => props.neutral && `
+  ${props => props.$neutral && `
     background: #F5F5F5;
     color: #424242;
     &:hover { background: #E0E0E0; transform: translateY(-1px); }
@@ -315,4 +317,126 @@ export const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+`
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+`
+
+export const ModalBox = styled.div`
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+`
+
+export const ModalTitle = styled.h3`
+  font-family: ${theme.fonts.secondary};
+  font-size: 1.25rem;
+  color: ${theme.colors.text};
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  svg {
+    color: #C62828;
+  }
+`
+
+export const ModalText = styled.p`
+  color: ${theme.colors.gray};
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.6;
+`
+
+export const ModalTextarea = styled.textarea`
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid ${theme.colors.lightGray};
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: ${theme.fonts.primary};
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  color: ${theme.colors.text};
+
+  &:focus {
+    outline: none;
+    border-color: #E53935;
+    box-shadow: 0 0 0 3px rgba(229,57,53,0.08);
+  }
+
+  &::placeholder { color: #BDBDBD; }
+`
+
+export const ModalActions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+`
+
+export const ModalCancelButton = styled.button`
+  padding: 0.6rem 1.25rem;
+  border: 2px solid ${theme.colors.lightGray};
+  border-radius: 8px;
+  background: transparent;
+  color: ${theme.colors.gray};
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { border-color: ${theme.colors.gray}; color: ${theme.colors.text}; }
+`
+
+export const ModalConfirmButton = styled.button`
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #C62828;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { background: #B71C1C; transform: translateY(-1px); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+`
+
+export const StoreAvatar = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: ${theme.colors.secondary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: ${theme.colors.primary};
+  flex-shrink: 0;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `

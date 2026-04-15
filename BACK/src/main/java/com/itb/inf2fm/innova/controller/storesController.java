@@ -3,6 +3,7 @@ package com.itb.inf2fm.innova.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import com.itb.inf2fm.innova.model.entity.PartnerRegisterRequest;
 import com.itb.inf2fm.innova.model.entity.stores;
 import com.itb.inf2fm.innova.model.entity.users;
 import com.itb.inf2fm.innova.model.services.storesServices;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stores")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class storesController {
 
     @Autowired
@@ -47,13 +48,6 @@ public class storesController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/cidade/{cidade}")
-    public ResponseEntity<Object> getByCidade(@PathVariable String cidade) {
-        List<stores> result = storesServices.findByCidade(cidade);
-        if (result.isEmpty()) return notFound("Nenhuma loja encontrada na cidade " + cidade);
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/top-rated")
     public ResponseEntity<List<stores>> getTopRated() {
         return ResponseEntity.ok(storesServices.findTopRated());
@@ -68,17 +62,41 @@ public class storesController {
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<Object> register(@RequestBody PartnerRegisterRequest req) {
+        try {
+            return ResponseEntity.ok(storesServices.registerPartner(req));
+        } catch (Exception e) {
+            return badRequest("Erro ao cadastrar parceiro: " + e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody stores store, HttpServletRequest request) {
-        if (!isAdmin(request)) return ResponseEntity.status(403).build();
+        if (!isAdmin(request)) return forbidden();
         return ResponseEntity.ok(storesServices.save(store));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable String id, @RequestBody stores store, HttpServletRequest request) {
-        if (!isAdmin(request)) return ResponseEntity.status(403).build();
+        if (!isAdmin(request)) return forbidden();
         try {
             return ResponseEntity.ok(storesServices.update(Long.parseLong(id), store));
+        } catch (NumberFormatException e) {
+            return badRequest("O id informado não é válido: " + id);
+        } catch (RuntimeException e) {
+            return notFound("Loja não encontrada com o id " + id);
+        }
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Object> updateStatus(@PathVariable String id, @RequestBody Map<String, String> body, HttpServletRequest request) {
+        if (!isAdmin(request)) return forbidden();
+        String status = body.get("status");
+        String rejectionReason = body.get("rejectionReason");
+        if (status == null || status.isBlank()) return badRequest("Status é obrigatório");
+        try {
+            return ResponseEntity.ok(storesServices.updateStatus(Long.parseLong(id), status, rejectionReason));
         } catch (NumberFormatException e) {
             return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
@@ -102,7 +120,7 @@ public class storesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable String id, HttpServletRequest request) {
-        if (!isAdmin(request)) return ResponseEntity.status(403).build();
+        if (!isAdmin(request)) return forbidden();
         try {
             storesServices.delete(Long.parseLong(id));
             Map<String, String> response = new HashMap<>();
@@ -117,9 +135,24 @@ public class storesController {
 
     private boolean isAdmin(HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
-        if (uid == null) return false;
+        if (uid == null) {
+            System.out.println("[isAdmin] firebaseUid nulo - token ausente ou inválido");
+            return false;
+        }
         users u = usersService.findByFirebaseUid(uid);
-        return u != null && "ADMIN".equals(u.getRole());
+        if (u == null) {
+            System.out.println("[isAdmin] usuário não encontrado no banco para uid: " + uid);
+            return false;
+        }
+        System.out.println("[isAdmin] uid=" + uid + " role=" + u.getRole());
+        return "ADMIN".equals(u.getRole());
+    }
+
+    private ResponseEntity<Object> forbidden() {
+        Map<String, Object> err = new HashMap<>();
+        err.put("status", 403);
+        err.put("message", "Acesso negado. Apenas administradores podem realizar esta ação.");
+        return ResponseEntity.status(403).body(err);
     }
 
     private ResponseEntity<Object> badRequest(String message) {

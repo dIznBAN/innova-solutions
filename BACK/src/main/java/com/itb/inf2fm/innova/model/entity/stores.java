@@ -17,8 +17,6 @@ public class stores {
     private Long id;
     @Column(nullable = false, length = 100)
     private String name;
-    @Column(nullable = true, length = 500)
-    private String description;
     @Column(nullable = true, length = 255)
     private String image_url;
     @Column(nullable = true, length = 255)
@@ -31,30 +29,37 @@ public class stores {
     private String status;
     @Column
     private Double avaliacao = 0.0;
-    @Column
-    private Integer total_avaliacoes;
-    @Column(nullable = false, length = 100)
-    private String cidade;
+    @Column(nullable = true, length = 18)
+    private String cnpj;
+    @Column(nullable = true, length = 100)
+    private String email;
+    @Column(nullable = true, length = 20)
+    private String phone;
+    @Column(nullable = true, length = 100)
+    private String owner_name;
+    @Column(nullable = true, length = 500)
+    private String rejection_reason;
 
-    public String getCidade() {
-        return cidade;
-    }
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
+    public String getRejection_reason() { return rejection_reason; }
+    public void setRejection_reason(String rejection_reason) { this.rejection_reason = rejection_reason; }
+
+    public String getCnpj() { return cnpj; }
+    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getOwner_name() { return owner_name; }
+    public void setOwner_name(String owner_name) { this.owner_name = owner_name; }
 
     public Double getAvaliacao() {
         return avaliacao;
     }
     public void setAvaliacao(Double avaliacao) {
         this.avaliacao = avaliacao;
-    }
-
-    public Integer getTotalAvaliacoes() {
-        return total_avaliacoes;
-    }
-    public void setTotalAvaliacoes(Integer totalAvaliacoes) {
-        this.total_avaliacoes = total_avaliacoes;
     }
 
 
@@ -70,13 +75,6 @@ public class stores {
     }
     public void setName(String name) {
         this.name = name;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getImage_url() {

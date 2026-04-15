@@ -14,6 +14,12 @@ public class coupons {
     @Column(nullable = false)
     private Long store_id;
 
+    @Column(length = 200, nullable = true)
+    private String title;
+
+    @Column(length = 500, nullable = true)
+    private String description;
+
     @Column(columnDefinition = "DECIMAL(5,2)", nullable = false)
     private Double discount;
 
@@ -51,6 +57,12 @@ public class coupons {
     public void setStore_id(Long store_id) {
         this.store_id = store_id;
     }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public Double getDiscount() {
         return discount;
