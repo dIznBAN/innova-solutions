@@ -50,6 +50,13 @@ class ApiService {
   }
 
   async getAllStores() { return this.request('/stores'); }
+  async getMyStores() { return this.request('/stores/minhas-lojas'); }
+  async getMyStore() { return this.request('/stores/minha-loja'); }
+  async updateStore(id, data) { return this.request(`/stores/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
+  async getCouponsByStore(storeId) { return this.request(`/coupons/store/${storeId}`); }
+  async createCoupon(data) { return this.request('/coupons', { method: 'POST', body: JSON.stringify(data) }); }
+  async updateCoupon(id, data) { return this.request(`/coupons/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
+  async deleteCoupon(id) { return this.request(`/coupons/${id}`, { method: 'DELETE' }); }
   async getStoreById(id) { return this.request(`/stores/${id}`); }
   async updateStoreStatus(id, status, rejectionReason = null) {
     return this.request(`/stores/${id}/status`, {

@@ -14,6 +14,11 @@ public interface storesRepository extends JpaRepository<stores, Long> {
 
         // Buscar por nome
         List<stores> findByName(String name);
+
+        stores findByFirebaseUid(String firebaseUid);
+
+        @Query("SELECT s FROM stores s WHERE s.firebaseUid = :uid")
+        List<stores> findAllByFirebaseUid(@Param("uid") String uid);
           
         // Buscar bazares com avaliação mínima
         @Query("SELECT b FROM stores b WHERE b.avaliacao >= :avaliacao ORDER BY b.avaliacao DESC")

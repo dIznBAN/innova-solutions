@@ -40,6 +40,12 @@ public class stores {
     @Column(nullable = true, length = 500)
     private String rejection_reason;
 
+    @Column(name = "firebase_uid", length = 128, nullable = true)
+    private String firebaseUid;
+
+    public String getFirebaseUid() { return firebaseUid; }
+    public void setFirebaseUid(String firebaseUid) { this.firebaseUid = firebaseUid; }
+
     public String getRejection_reason() { return rejection_reason; }
     public void setRejection_reason(String rejection_reason) { this.rejection_reason = rejection_reason; }
 

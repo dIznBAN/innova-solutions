@@ -23,6 +23,11 @@ public class couponsController {
         return ResponseEntity.ok(couponsService.findAll());
     }
 
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<List<coupons>> getByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(couponsService.findByStoreId(storeId));
+    }
+
     @GetMapping("/findAll")
     public ResponseEntity<List<coupons>> findAll() {
         return ResponseEntity.ok(couponsService.findAll());
@@ -60,6 +65,8 @@ public class couponsController {
             coupons couponsExistente = couponsService.findById(couponsId);
 
             couponsExistente.setStore_id(coupons.getStore_id());
+            couponsExistente.setTitle(coupons.getTitle());
+            couponsExistente.setDescription(coupons.getDescription());
             couponsExistente.setDiscount(coupons.getDiscount());
             couponsExistente.setAffiliate_link(coupons.getAffiliate_link());
             couponsExistente.setImage_url(coupons.getImage_url());

@@ -12,6 +12,10 @@ public class PartnerRegisterRequest {
     private String validUntil;
     private String description;
     private String imageUrl;
+    private String firebaseUid;
+
+    public String getFirebaseUid() { return firebaseUid; }
+    public void setFirebaseUid(String firebaseUid) { this.firebaseUid = firebaseUid; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }

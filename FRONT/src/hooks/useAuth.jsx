@@ -8,6 +8,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [dbUser, setDbUser] = useState(null);
+  const [userStore, setUserStore] = useState(null);
+  const [userStores, setUserStores] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,8 +18,14 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         const profile = await api.getUserByFirebaseUid(firebaseUser.uid).catch(() => null);
         setDbUser(profile);
+        const store = await api.getMyStore().catch(() => null);
+        setUserStore(store);
+        const stores = await api.getMyStores().catch(() => []);
+        setUserStores(Array.isArray(stores) ? stores : []);
       } else {
         setDbUser(null);
+        setUserStore(null);
+        setUserStores([]);
       }
       setLoading(false);
     });
@@ -27,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, dbUser, setDbUser, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, dbUser, setDbUser, userStore, setUserStore, userStores, setUserStores, logout, loading, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -40,6 +40,25 @@ export const StoreImage = styled.img`
   }
 `
 
+export const PlaceholderImage = styled.div`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, ${theme.colors.primaryLight} 0%, ${theme.colors.primary} 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${theme.fonts.secondary};
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -1px;
+  transition: transform 0.3s ease;
+
+  ${Card}:hover & {
+    transform: scale(1.05);
+  }
+`
+
 export const DiscountBadge = styled.div`
   position: absolute;
   top: 12px;
