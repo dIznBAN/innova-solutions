@@ -15,8 +15,6 @@ public interface storesRepository extends JpaRepository<stores, Long> {
         // Buscar por nome
         List<stores> findByName(String name);
 
-        stores findByFirebaseUid(String firebaseUid);
-
         @Query("SELECT s FROM stores s WHERE s.firebaseUid = :uid")
         List<stores> findAllByFirebaseUid(@Param("uid") String uid);
           
