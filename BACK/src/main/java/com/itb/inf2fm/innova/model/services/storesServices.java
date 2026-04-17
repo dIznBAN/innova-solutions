@@ -20,6 +20,14 @@ public class storesServices {
     @Autowired
     private couponsRepository couponsRepository;
 
+    public List<stores> findAllByFirebaseUid(String firebaseUid) {
+        return storesRepository.findAllByFirebaseUid(firebaseUid);
+    }
+
+    public stores findByFirebaseUid(String firebaseUid) {
+        return storesRepository.findByFirebaseUid(firebaseUid);
+    }
+
     public List<stores> findAll() {
         return storesRepository.findAll();
     }
@@ -56,6 +64,7 @@ public class storesServices {
         store.setPhone(req.getPhone());
         store.setWebsite_url(req.getWebsite());
         store.setImage_url(req.getImageUrl());
+        store.setFirebaseUid(req.getFirebaseUid());
         store.setStatus("Pendente");
         store.setAvaliacao(0.0);
         store.setCreated_at(LocalDateTime.now());

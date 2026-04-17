@@ -13,6 +13,10 @@ public class couponsService {
     @Autowired
     private couponsRepository couponsRepository;
 
+    public List<coupons> findByStoreId(Long storeId) {
+        return couponsRepository.findByStoreId(storeId);
+    }
+
     public List<coupons> findAll() {
         return couponsRepository.findAll();
     }

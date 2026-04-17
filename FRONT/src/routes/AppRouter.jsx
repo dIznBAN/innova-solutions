@@ -8,6 +8,8 @@ import MyCouponsPage from '../pages/MyCoupons'
 import PartnerRegister from '../pages/PartnerRegister'
 import Admin from '../pages/Admin'
 import ProfilePage from '../pages/Profile'
+import MyStore from '../pages/MyStore'
+import MyStores from '../pages/MyStores'
 import TermsOfUse from '../pages/TermsOfUse'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -45,9 +47,11 @@ const AppRouter = () => {
           <Route path="/registro" element={<AuthPage />} />
           <Route path="/esqueceu-senha" element={<ForgotPasswordPage />} />
           <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/cadastro-parceiro" element={<PartnerRegister />} />
+          <Route path="/cadastro-parceiro" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
           <Route path="/termos-de-uso" element={<TermsOfUse />} />
+          <Route path="/minhas-lojas" element={<ProtectedRoute><MyStores /></ProtectedRoute>} />
+          <Route path="/minha-loja/:id" element={<ProtectedRoute><MyStore /></ProtectedRoute>} />
         </Routes>
       </Layout>
     </Router>

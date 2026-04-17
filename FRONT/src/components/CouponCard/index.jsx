@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Eye, Percent } from 'lucide-react';
-import { Card, StoreImage, StoreName, Discount, CouponButton, ImageContainer, DiscountBadge } from "./styles";
+import { Card, StoreImage, PlaceholderImage, StoreName, Discount, CouponButton, ImageContainer, DiscountBadge } from "./styles";
 
 const CouponCard = ({ storeName, discount, image, index, onViewCoupon }) => {
   return (
@@ -13,13 +13,10 @@ const CouponCard = ({ storeName, discount, image, index, onViewCoupon }) => {
       whileTap={{ scale: 0.98 }}
     >
       <ImageContainer>
-        <StoreImage
-          src={
-            image ||
-            "https://via.placeholder.com/200x120.png?text=Imagem+Indisponível"
-          }
-          alt={storeName}
-        />
+        {image
+          ? <StoreImage src={image} alt={storeName} />
+          : <PlaceholderImage>{storeName?.charAt(0).toUpperCase()}</PlaceholderImage>
+        }
         <DiscountBadge
           as={motion.div}
           initial={{ scale: 0, rotate: -180 }}

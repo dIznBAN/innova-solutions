@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import CouponsSection from '../../components/CouponsSection'
 import { 
   Container, 
@@ -13,6 +14,7 @@ import {
 } from './styles'
 
 function Home(){
+    const navigate = useNavigate();
     const particles = Array.from({ length: 20 }, (_, i) => i);
 
     return (
@@ -71,8 +73,8 @@ function Home(){
                     </HeroSubtitle>
                     
                     <HeroButton
-                        as={motion.a}
-                        href="/cupons"
+                        as={motion.button}
+                        onClick={() => navigate('/cupons')}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.6, delay: 0.6 }}

@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { FaUser, FaSignOutAlt, FaTicketAlt, FaUserShield } from 'react-icons/fa'
+import { FaUser, FaSignOutAlt, FaTicketAlt, FaUserShield, FaStore } from 'react-icons/fa'
 import { useClickOutside } from '../../hooks/useClickOutside'
 import { useAuth } from '../../hooks/useAuth.jsx'
 import { Container, ProfileIcon, Dropdown, DropdownItem, UserInfo, UserName, UserStatus } from './styles'
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { isAuthenticated, user, dbUser, logout } = useAuth()
+  const { isAuthenticated, user, dbUser, userStores, logout } = useAuth()
   const navigate = useNavigate()
   const dropdownRef = useClickOutside(() => setIsOpen(false))
 
@@ -67,6 +67,12 @@ const ProfileDropdown = () => {
             </DropdownItem>
           )}
           <DropdownItem onClick={() => { setIsOpen(false); navigate('/perfil'); }}>Meu Perfil</DropdownItem>
+          {userStores?.length > 0 && (
+            <DropdownItem onClick={() => { setIsOpen(false); navigate('/minhas-lojas'); }}>
+              <FaStore style={{ marginRight: '8px' }} />
+              Minhas Lojas
+            </DropdownItem>
+          )}
           <DropdownItem onClick={() => { setIsOpen(false); navigate('/meus-cupons'); }}>
             <FaTicketAlt style={{ marginRight: '8px' }} />
             Meus Cupons

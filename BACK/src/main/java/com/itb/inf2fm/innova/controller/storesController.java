@@ -25,6 +25,22 @@ public class storesController {
     @Autowired
     private usersService usersService;
 
+    @GetMapping("/minhas-lojas")
+    public ResponseEntity<Object> getMyStores(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        if (uid == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(storesServices.findAllByFirebaseUid(uid));
+    }
+
+    @GetMapping("/minha-loja")
+    public ResponseEntity<Object> getMyStore(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        if (uid == null) return ResponseEntity.status(401).build();
+        stores store = storesServices.findByFirebaseUid(uid);
+        if (store == null) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(store);
+    }
+
     @GetMapping
     public ResponseEntity<List<stores>> getAll() {
         return ResponseEntity.ok(storesServices.findAll());
@@ -63,7 +79,10 @@ public class storesController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody PartnerRegisterRequest req) {
+    public ResponseEntity<Object> register(@RequestBody PartnerRegisterRequest req, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        if (uid == null) return ResponseEntity.status(401).body(Map.of("message", "Autenticação necessária"));
+        req.setFirebaseUid(uid);
         try {
             return ResponseEntity.ok(storesServices.registerPartner(req));
         } catch (Exception e) {

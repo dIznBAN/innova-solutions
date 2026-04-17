@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import ApiService from '../../services/api'
 import {
   FaBuilding, FaIdCard, FaUser, FaEnvelope, FaPhone, FaGlobe,
@@ -26,6 +27,7 @@ const BENEFITS = [
 ]
 
 const PartnerRegister = () => {
+  const { user } = useAuth()
   const [formData, setFormData] = useState({
     companyName: '', cnpj: '', ownerName: '', email: '',
     phone: '', website: '', couponTitle: '', discount: '',
@@ -126,7 +128,7 @@ const PartnerRegister = () => {
         imageUrl = await uploadToImgBB(imageFile)
         setUploadingImage(false)
       }
-      await ApiService.registerPartner({ ...formData, imageUrl })
+      await ApiService.registerPartner({ ...formData, imageUrl, firebaseUid: user?.uid })
       setSubmitted(true)
     } catch (err) {
       setUploadingImage(false)
