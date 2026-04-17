@@ -25,7 +25,8 @@ public class storesServices {
     }
 
     public stores findByFirebaseUid(String firebaseUid) {
-        return storesRepository.findByFirebaseUid(firebaseUid);
+        List<stores> results = storesRepository.findAllByFirebaseUid(firebaseUid);
+        return results.isEmpty() ? null : results.get(0);
     }
 
     public List<stores> findAll() {

@@ -29,9 +29,8 @@ const CouponsSection = () => {
         ]);
         const storeMap = {};
         stores.forEach(s => { storeMap[s.id] = s; });
-        const now = new Date();
         const normalized = rawCoupons
-          .filter(c => new Date(c.valid_until) >= now)
+          .sort((a, b) => a.id - b.id)
           .slice(0, 6)
           .map(c => {
             const store = storeMap[c.store_id] || {};
@@ -39,7 +38,7 @@ const CouponsSection = () => {
               id: c.id,
               storeName: store.name || 'Loja',
               discount: c.discount,
-              image: store.image_url || null,
+              image: store.image_url?.trim() || null,
               website: store.website_url || '#',
               description: c.description || '',
               title: c.title || '',
@@ -63,7 +62,7 @@ const CouponsSection = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        Mais Cupons
+        Melhores Cupons
       </Title>
 
       <CouponsGrid

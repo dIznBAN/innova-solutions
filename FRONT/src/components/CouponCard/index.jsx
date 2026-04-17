@@ -13,7 +13,7 @@ const CouponCard = ({ storeName, discount, image, index, onViewCoupon }) => {
       whileTap={{ scale: 0.98 }}
     >
       <ImageContainer>
-        {image
+        {image?.trim()
           ? <StoreImage src={image} alt={storeName} />
           : <PlaceholderImage>{storeName?.charAt(0).toUpperCase()}</PlaceholderImage>
         }
