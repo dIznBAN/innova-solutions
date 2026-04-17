@@ -1,5 +1,6 @@
 package com.itb.inf2fm.innova.model.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,11 @@ public class couponsService {
     private couponsRepository couponsRepository;
 
     public List<coupons> findByStoreId(Long storeId) {
-        return couponsRepository.findByStoreId(storeId);
+        return couponsRepository.findByStoreId(storeId, LocalDateTime.now());
     }
 
     public List<coupons> findAll() {
-        return couponsRepository.findAll();
+        return couponsRepository.findAllValid(LocalDateTime.now());
     }
 
     public coupons save(coupons coupons) {
