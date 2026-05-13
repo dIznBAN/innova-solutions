@@ -12,6 +12,7 @@ import MyStore from '../pages/MyStore'
 import MyStores from '../pages/MyStores'
 import Privacy from '../pages/Privacy'
 import About from '../pages/About'
+import StoresPage from '../pages/Stores'
 import TermsOfUse from '../pages/TermsOfUse'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -51,6 +52,7 @@ const AppRouter = () => {
           <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/cadastro-parceiro" element={<ProtectedRoute><PartnerRegister /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/lojas" element={<StoresPage />} />
           <Route path="/termos-de-uso" element={<TermsOfUse />} />
           <Route path="/politica-de-privacidade" element={<Privacy />} />
           <Route path="/sobre" element={<About />} />

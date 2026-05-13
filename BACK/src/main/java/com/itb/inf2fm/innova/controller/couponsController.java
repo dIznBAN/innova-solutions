@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import com.itb.inf2fm.innova.model.entity.coupons;
 import com.itb.inf2fm.innova.model.services.couponsService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,13 @@ public class couponsController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody coupons coupons) {
+        if (coupons.getValid_until() == null || coupons.getValid_until().isBefore(LocalDateTime.now())) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 400);
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("message", "Não é possível cadastrar um cupom já vencido.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
         return ResponseEntity.ok(couponsService.save(coupons));
     }
 

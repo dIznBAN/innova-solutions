@@ -27,6 +27,13 @@ const Header = () => {
           </NavItem>
           <NavItem 
             as={Link} 
+            to="/lojas"
+            className={location.pathname === '/lojas' ? 'active' : ''}
+          >
+            Lojas
+          </NavItem>
+          <NavItem 
+            as={Link} 
             to="/cadastro-parceiro"
             className={location.pathname === '/cadastro-parceiro' ? 'active' : ''}
           >
