@@ -103,7 +103,10 @@ public class storesServices {
     }
 
     public void delete(Long id) {
-        storesRepository.delete(findById(id));
+        stores store = findById(id);
+        List<coupons> storeCoupons = couponsRepository.findByStoreId(id);
+        couponsRepository.deleteAll(storeCoupons);
+        storesRepository.delete(store);
     }
 
     public stores updateStatus(Long id, String status, String rejectionReason) {

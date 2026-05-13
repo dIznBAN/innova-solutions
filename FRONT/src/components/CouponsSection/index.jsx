@@ -30,6 +30,7 @@ const CouponsSection = () => {
         const storeMap = {};
         stores.forEach(s => { storeMap[s.id] = s; });
         const normalized = rawCoupons
+          .filter(c => new Date(c.valid_until) >= new Date())
           .sort((a, b) => a.id - b.id)
           .slice(0, 6)
           .map(c => {
@@ -38,7 +39,7 @@ const CouponsSection = () => {
               id: c.id,
               storeName: store.name || 'Loja',
               discount: c.discount,
-              image: store.image_url?.trim() || null,
+              image: c.image_url?.trim() || store.image_url?.trim() || null,
               website: store.website_url || '#',
               description: c.description || '',
               title: c.title || '',

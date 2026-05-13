@@ -181,8 +181,7 @@ const MyStore = () => {
         description: couponForm.description,
         image_url: imageUrl || null,
         valid_from: new Date().toISOString(),
-        valid_until: new Date(couponForm.valid_until + 'T23:59:59').toISOString(),
-        created_at: new Date().toISOString()
+        valid_until: couponForm.valid_until + 'T23:59:59',
       }
 
       if (couponModal === 'new') {

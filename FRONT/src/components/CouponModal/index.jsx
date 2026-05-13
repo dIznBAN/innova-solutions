@@ -1,60 +1,64 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import api from '../../services/api'
+import { useAuth } from '../../hooks/useAuth'
 import {
-  Overlay,
-  Modal,
-  CloseButton,
-  Header,
-  StoreImage,
-  StoreName,
-  Discount,
-  Content,
-  Section,
-  SectionTitle,
-  Text,
-  RulesList,
-  RuleItem,
-  Footer,
-  CouponButton
+  Overlay, Modal, CloseButton, Header, StoreImage, StoreName, Discount,
+  Content, Section, SectionTitle, Text, RulesList, RuleItem, Footer, CouponButton
 } from './styles'
 
 const CouponModal = ({ coupon, isOpen, onClose }) => {
   if (!isOpen || !coupon) return null
-  
 
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
-  const handleUseOffer = () => {
-    // Salvar cupom no localStorage
-    const savedCoupons = JSON.parse(localStorage.getItem('myCoupons') || '[]')
-    const couponExists = savedCoupons.find(c => c.id === coupon.id)
-    
-    if (!couponExists) {
-      savedCoupons.push(coupon)
-      localStorage.setItem('myCoupons', JSON.stringify(savedCoupons))
+  const handleUseOffer = async () => {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
     }
-    
-    // Mostrar mensagem de sucesso
-    alert('Cupom adicionado a Meus Cupons!')
-    
-    // Redirecionar para Meus Cupons
-    window.location.href = '/meus-cupons'
+    try {
+      await api.saveUserCoupon(coupon.id)
+    } catch (e) {
+      // já salvo, ignora
+    }
+    navigate('/meus-cupons')
   }
 
   return (
     <Overlay onClick={onClose}>
       <Modal onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={onClose}>×</CloseButton>
-        
+
         <Header>
-          <StoreImage src={coupon.image} alt={coupon.storeName} />
+          {coupon.image
+            ? <StoreImage src={coupon.image} alt={coupon.storeName} />
+            : <div style={{
+                width: '100%', height: '160px',
+                background: 'linear-gradient(135deg, #CDA09B, #A67168)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '4rem', fontWeight: 700, color: 'white',
+                fontFamily: "'Playfair Display', serif"
+              }}>
+                {coupon.storeName?.charAt(0).toUpperCase()}
+              </div>
+          }
           <StoreName>{coupon.storeName}</StoreName>
-          <Discount>{coupon.discount}%</Discount>
+          <Discount>{coupon.discount}% OFF</Discount>
         </Header>
 
         <Content>
+          {coupon.title && (
+            <Section>
+              <SectionTitle>{coupon.title}</SectionTitle>
+            </Section>
+          )}
+
           <Section>
             <SectionTitle>Descrição da Oferta</SectionTitle>
             <Text>
-              {coupon.description || `Aproveite ${coupon.discount}% de desconto em toda a loja ${coupon.storeName}. Uma oportunidade única para renovar seu estilo com produtos de qualidade.`}
+              {coupon.description || `Aproveite ${coupon.discount}% de desconto em toda a loja ${coupon.storeName}.`}
             </Text>
           </Section>
 
@@ -71,11 +75,10 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
           <Section>
             <SectionTitle>Termos e Condições</SectionTitle>
             <RulesList>
-              <RuleItem>Oferta válida até {coupon.validUntil || '31/12/2024'}</RuleItem>
+              <RuleItem>Oferta válida até {coupon.validUntil}</RuleItem>
               <RuleItem>Não cumulativo com outras promoções</RuleItem>
               <RuleItem>Válido apenas para compras online</RuleItem>
               <RuleItem>Sujeito à disponibilidade de estoque</RuleItem>
-              <RuleItem>A loja se reserva o direito de alterar os termos</RuleItem>
             </RulesList>
           </Section>
         </Content>

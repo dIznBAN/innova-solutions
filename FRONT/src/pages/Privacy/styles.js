@@ -90,7 +90,6 @@ export const MetaItem = styled.span`
   gap: 0.4rem;
   color: rgba(255,255,255,0.75);
   font-size: 0.82rem;
-
   svg { font-size: 0.9rem; }
 `;
 
@@ -146,7 +145,6 @@ export const TocItem = styled.li`
     font-size: 0.875rem;
     transition: color 0.2s;
     line-height: 1.8;
-
     &:hover { color: ${theme.colors.primary}; }
   }
 `;
@@ -165,9 +163,7 @@ export const Section = styled.section`
     border-color: rgba(205,160,155,0.25);
   }
 
-  @media (max-width: 600px) {
-    padding: 1.5rem;
-  }
+  @media (max-width: 600px) { padding: 1.5rem; }
 `;
 
 export const SectionHeader = styled.div`
@@ -220,7 +216,7 @@ export const Highlight = styled.div`
   line-height: 1.7;
 `;
 
-export const Footer = styled.div`
+export const PageFooter = styled.div`
   text-align: center;
   padding: 2.5rem 1.5rem;
   background: white;
@@ -239,7 +235,131 @@ export const Footer = styled.div`
     color: ${theme.colors.primary};
     font-weight: 600;
     text-decoration: none;
-
     &:hover { text-decoration: underline; }
   }
+`;
+
+/* ── Exclusivos da página Sobre Nós ── */
+
+export const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+`;
+
+export const StatCard = styled.div`
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid rgba(205,160,155,0.12);
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(166,113,104,0.1);
+    border-color: rgba(205,160,155,0.25);
+    transform: translateY(-3px);
+  }
+`;
+
+export const StatNumber = styled.div`
+  font-family: ${theme.fonts.secondary};
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: ${theme.colors.primary};
+  line-height: 1;
+  margin-bottom: 0.4rem;
+`;
+
+export const StatLabel = styled.div`
+  font-size: 0.82rem;
+  color: ${theme.colors.gray};
+  font-weight: 500;
+`;
+
+export const ValuesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+`;
+
+export const ValueCard = styled.div`
+  background: linear-gradient(135deg, ${theme.colors.secondary}60, #fdf0ee);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(205,160,155,0.2);
+`;
+
+export const ValueIcon = styled.div`
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+`;
+
+export const ValueTitle = styled.h4`
+  font-family: ${theme.fonts.secondary};
+  font-size: 1rem;
+  color: ${theme.colors.text};
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+`;
+
+export const ValueText = styled.p`
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+`;
+
+export const TeamGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+`;
+
+export const TeamCard = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(205,160,155,0.15);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(166,113,104,0.12);
+    transform: translateY(-3px);
+  }
+`;
+
+export const TeamAvatar = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, ${theme.colors.primaryLight}, ${theme.colors.primary});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${theme.fonts.secondary};
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 auto 0.75rem;
+`;
+
+export const TeamName = styled.h4`
+  font-family: ${theme.fonts.secondary};
+  font-size: 0.95rem;
+  color: ${theme.colors.text};
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+`;
+
+export const TeamRole = styled.p`
+  font-size: 0.78rem;
+  color: ${theme.colors.gray};
+  margin: 0;
 `;

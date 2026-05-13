@@ -13,16 +13,18 @@ import {
 const normalizeCoupons = (coupons, stores) => {
   const storeMap = {};
   stores.forEach(s => { storeMap[s.id] = s; });
-  const now = new Date();
   return coupons
-    .filter(c => new Date(c.valid_until) >= now)
+    .filter(c => {
+      const store = storeMap[c.store_id];
+      return store && store.status === 'Aprovada' && new Date(c.valid_until) >= new Date();
+    })
     .map(c => {
-      const store = storeMap[c.store_id] || {};
+      const store = storeMap[c.store_id];
       return {
         id: c.id,
-        storeName: store.name || 'Loja',
+        storeName: store.name,
         discount: c.discount,
-        image: store.image_url || null,
+        image: c.image_url?.trim() || store.image_url?.trim() || null,
         website: store.website_url || '#',
         description: c.description || '',
         title: c.title || '',
@@ -133,24 +135,21 @@ const CouponsPage = () => {
         <CouponsGrid>
           {filteredCoupons.map((coupon) => (
             <CouponCard key={coupon.id}>
-              <CouponImage
-                src={coupon.image || null}
-                alt={coupon.storeName}
-                style={!coupon.image ? { display: 'none' } : {}}
-              />
-              {!coupon.image && (
-                <div style={{
-                  width: '100%', height: '100%',
-                  background: 'linear-gradient(135deg, #CDA09B, #A67168)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '3rem', fontWeight: 700, color: 'white',
-                  fontFamily: "'Playfair Display', serif"
-                }}>
-                  {coupon.storeName?.charAt(0).toUpperCase()}
-                </div>
-              )}
+              {coupon.image
+                ? <CouponImage src={coupon.image} alt={coupon.storeName} />
+                : <div style={{
+                    width: '100%', height: '180px', flexShrink: 0,
+                    background: 'linear-gradient(135deg, #CDA09B, #A67168)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '3.5rem', fontWeight: 700, color: 'white',
+                    fontFamily: "'Playfair Display', serif"
+                  }}>
+                    {coupon.storeName?.charAt(0).toUpperCase()}
+                  </div>
+              }
               <CouponContent>
                 <StoreName>{coupon.storeName}</StoreName>
+                {coupon.title && <p style={{ color: '#6B6B6B', fontSize: '0.9rem', margin: 0 }}>{coupon.title}</p>}
                 <Discount>{coupon.discount}% OFF</Discount>
                 <CouponButton onClick={() => { setSelectedCoupon(coupon); setShowModal(true); }}>
                   Ver Detalhes

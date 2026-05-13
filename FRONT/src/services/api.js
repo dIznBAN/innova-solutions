@@ -57,6 +57,10 @@ class ApiService {
   async createCoupon(data) { return this.request('/coupons', { method: 'POST', body: JSON.stringify(data) }); }
   async updateCoupon(id, data) { return this.request(`/coupons/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
   async deleteCoupon(id) { return this.request(`/coupons/${id}`, { method: 'DELETE' }); }
+
+  async getMyCoupons() { return this.request('/user-coupons'); }
+  async saveUserCoupon(couponId) { return this.request(`/user-coupons/${couponId}`, { method: 'POST' }); }
+  async removeUserCoupon(couponId) { return this.request(`/user-coupons/${couponId}`, { method: 'DELETE' }); }
   async getStoreById(id) { return this.request(`/stores/${id}`); }
   async updateStoreStatus(id, status, rejectionReason = null) {
     return this.request(`/stores/${id}/status`, {
@@ -64,6 +68,7 @@ class ApiService {
       body: JSON.stringify({ status, rejectionReason }),
     })
   }
+  async deleteStore(id) { return this.request(`/stores/${id}`, { method: 'DELETE' }); }
 }
 
 export default new ApiService();

@@ -109,6 +109,18 @@ const Admin = () => {
     }
   }
 
+  const handleDeleteStore = async (id) => {
+    if (!window.confirm('Tem certeza? Isso irá excluir a loja e TODOS os cupons dela permanentemente.')) return
+    try {
+      await ApiService.deleteStore(id)
+      const updated = realPartners.filter(p => p.id !== id)
+      setRealPartners(updated)
+      setFilteredPartners(updated)
+    } catch (err) {
+      alert(err.message || 'Erro ao excluir loja')
+    }
+  }
+
   const handleDeleteUser = async (id) => {
     if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return
     try {
@@ -301,7 +313,7 @@ const Admin = () => {
                           )}
                           {partner.status?.toLowerCase() === 'aprovada' && (
                             <ActionButton $reject onClick={() => handleOpenRejectModal(partner)}>
-                              <FaTimes /> Rejeitar
+                              <FaTimes /> Desativar
                             </ActionButton>
                           )}
                           {partner.status?.toLowerCase() === 'rejeitada' && (
@@ -309,6 +321,9 @@ const Admin = () => {
                               <FaCheck /> Reativar
                             </ActionButton>
                           )}
+                          <ActionButton $reject onClick={() => handleDeleteStore(partner.id)}>
+                            <FaTrash /> Excluir
+                          </ActionButton>
                         </ActionsCell>
                       </TableCell>
                     </TableRow>

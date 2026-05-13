@@ -68,11 +68,11 @@ const Footer = () => {
               <FileText size={14} />
               Termos de Uso
             </Link>
-            <Link href="#">
+            <Link as={RouterLink} to="/politica-de-privacidade">
               <Shield size={14} />
               Política de Privacidade
             </Link>
-            <Link href="#">
+            <Link as={RouterLink} to="/sobre">
               <Info size={14} />
               Sobre Nós
             </Link>
