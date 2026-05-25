@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FaTrash, FaUsers, FaStore, FaTicketAlt, FaChartBar, FaShieldAlt, FaUserShield, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa'
+import { FaTrash, FaUsers, FaStore, FaTicketAlt, FaShieldAlt, FaUserShield, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa'
 import ApiService from '../../services/api'
 import {
   Container, Header, Title,
@@ -12,12 +12,6 @@ import {
   ModalOverlay, ModalBox, ModalTitle, ModalText, ModalTextarea, ModalActions, ModalCancelButton, ModalConfirmButton,
   StoreAvatar
 } from './styles'
-
-const mockCoupons = [
-  { id: 1, title: '20% OFF Joias', partner: 'Bella Acessórios', discount: '20%', status: 'Ativo', expires: '2024-12-31' },
-  { id: 2, title: '15% Desconto', partner: 'Glamour Store', discount: '15%', status: 'Pendente', expires: '2024-11-30' },
-  { id: 3, title: '30% Black Friday', partner: 'Luxo Acessórios', discount: '30%', status: 'Ativo', expires: '2024-11-29' }
-]
 
 const statusVariant = (status) => {
   if (status === 'Aprovada') return 'active'
@@ -39,7 +33,9 @@ const Admin = () => {
   const [filteredUsers, setFilteredUsers] = useState([])
   const [realPartners, setRealPartners] = useState([])
   const [filteredPartners, setFilteredPartners] = useState([])
-  const [filteredCoupons, setFilteredCoupons] = useState(mockCoupons)
+  const [realCoupons, setRealCoupons] = useState([])
+  const [filteredCoupons, setFilteredCoupons] = useState([])
+  const [loadingCoupons, setLoadingCoupons] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadingPartners, setLoadingPartners] = useState(false)
   const [rejectModal, setRejectModal] = useState(null)
@@ -49,6 +45,7 @@ const Admin = () => {
   useEffect(() => {
     loadUsers()
     loadPartners()
+    loadCoupons()
   }, [])
 
   const loadUsers = async () => {
@@ -61,6 +58,19 @@ const Admin = () => {
       console.error('Erro ao carregar usuários:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadCoupons = async () => {
+    try {
+      setLoadingCoupons(true)
+      const coupons = await ApiService.getAllCoupons()
+      setRealCoupons(coupons)
+      setFilteredCoupons(coupons)
+    } catch (error) {
+      console.error('Erro ao carregar cupons:', error)
+    } finally {
+      setLoadingCoupons(false)
     }
   }
 
@@ -151,8 +161,8 @@ const Admin = () => {
     setFilteredPartners(realPartners.filter(p =>
       p.name?.toLowerCase().includes(lower) || p.email?.toLowerCase().includes(lower)
     ))
-    setFilteredCoupons(mockCoupons.filter(c =>
-      c.title.toLowerCase().includes(lower) || c.partner.toLowerCase().includes(lower)
+    setFilteredCoupons(realCoupons.filter(c =>
+      c.title?.toLowerCase().includes(lower) || String(c.store_id).includes(lower)
     ))
     setFilteredUsers(realUsers.filter(u =>
       u.name?.toLowerCase().includes(lower) || u.email?.toLowerCase().includes(lower)
@@ -177,7 +187,7 @@ const Admin = () => {
           <StatCard>
             <StatIcon><FaTicketAlt /></StatIcon>
             <StatInfo>
-              <StatNumber>156</StatNumber>
+              <StatNumber>{realCoupons.length || '—'}</StatNumber>
               <StatLabel>Cupons Ativos</StatLabel>
             </StatInfo>
           </StatCard>
@@ -188,13 +198,7 @@ const Admin = () => {
               <StatLabel>Usuários</StatLabel>
             </StatInfo>
           </StatCard>
-          <StatCard>
-            <StatIcon><FaChartBar /></StatIcon>
-            <StatInfo>
-              <StatNumber>3.891</StatNumber>
-              <StatLabel>Cupons Utilizados</StatLabel>
-            </StatInfo>
-          </StatCard>
+
         </StatsGrid>
 
         <TabsContainer>
@@ -339,33 +343,28 @@ const Admin = () => {
                 <TableHeader>
                   <tr>
                     <TableHeaderCell>Título</TableHeaderCell>
-                    <TableHeaderCell>Parceiro</TableHeaderCell>
+                    <TableHeaderCell>Loja</TableHeaderCell>
                     <TableHeaderCell>Desconto</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell>Expira</TableHeaderCell>
+                    <TableHeaderCell>Válido até</TableHeaderCell>
                     <TableHeaderCell>Ações</TableHeaderCell>
                   </tr>
                 </TableHeader>
                 <TableBody>
-                  {filteredCoupons.length === 0 ? (
-                    <tr><td colSpan="6"><EmptyState>Nenhum cupom encontrado</EmptyState></td></tr>
+                  {loadingCoupons ? (
+                    <tr><td colSpan="5"><LoadingState>Carregando cupons...</LoadingState></td></tr>
+                  ) : filteredCoupons.length === 0 ? (
+                    <tr><td colSpan="5"><EmptyState>Nenhum cupom encontrado</EmptyState></td></tr>
                   ) : filteredCoupons.map(coupon => (
                     <TableRow key={coupon.id}>
                       <TableCell>{coupon.title}</TableCell>
-                      <TableCell>{coupon.partner}</TableCell>
-                      <TableCell><strong>{coupon.discount}</strong></TableCell>
-                      <TableCell><Badge $variant={statusVariant(coupon.status)}>{coupon.status}</Badge></TableCell>
-                      <TableCell>{coupon.expires}</TableCell>
+                      <TableCell>{realPartners.find(p => p.id === coupon.store_id)?.name || `Loja #${coupon.store_id}`}</TableCell>
+                      <TableCell><strong>{coupon.discount}%</strong></TableCell>
+                      <TableCell>{coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString('pt-BR') : '—'}</TableCell>
                       <TableCell>
                         <ActionsCell>
-                          {coupon.status === 'Pendente' ? (
-                            <>
-                              <ActionButton $approve>Aprovar</ActionButton>
-                              <ActionButton $reject>Rejeitar</ActionButton>
-                            </>
-                          ) : (
-                            <ActionButton $reject>Desativar</ActionButton>
-                          )}
+                          <ActionButton $reject onClick={() => { if (window.confirm('Excluir este cupom?')) ApiService.deleteCoupon(coupon.id).then(() => { const updated = realCoupons.filter(c => c.id !== coupon.id); setRealCoupons(updated); setFilteredCoupons(updated) }).catch(() => alert('Erro ao excluir cupom')) }}>
+                            <FaTrash /> Excluir
+                          </ActionButton>
                         </ActionsCell>
                       </TableCell>
                     </TableRow>

@@ -49,6 +49,7 @@ class ApiService {
     });
   }
 
+  async getAllCoupons() { return this.request('/coupons'); }
   async getAllStores() { return this.request('/stores'); }
   async getMyStores() { return this.request('/stores/minhas-lojas'); }
   async getMyStore() { return this.request('/stores/minha-loja'); }

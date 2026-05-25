@@ -416,6 +416,7 @@ const MyStore = () => {
                     value={couponForm.valid_until}
                     onChange={handleCouponChange}
                     required
+                    min={new Date().toISOString().split('T')[0]}
                   />
                 </FormGroup>
               </FieldGrid>

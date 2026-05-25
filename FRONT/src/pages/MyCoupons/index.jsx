@@ -22,8 +22,7 @@ const MyCouponsPage = () => {
         const storeMap = {};
         allStores.forEach(s => { storeMap[s.id] = s; });
         setStores(storeMap);
-        const now = new Date();
-        setMyCoupons(coupons);
+        setMyCoupons(coupons.filter(c => storeMap[c.store_id]?.status === 'Aprovada'));
       } catch (e) {
         console.error('Erro ao carregar meus cupons:', e);
       } finally {

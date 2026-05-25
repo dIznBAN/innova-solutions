@@ -16,8 +16,9 @@ const StoresPage = () => {
   useEffect(() => {
     api.getAllStores()
       .then(stores => {
-        setAllStores(stores)
-        setFilteredStores(stores)
+        const approved = stores.filter(s => s.status === 'Aprovada')
+        setAllStores(approved)
+        setFilteredStores(approved)
       })
       .catch(e => console.error('Erro ao carregar lojas:', e))
       .finally(() => setLoading(false))
