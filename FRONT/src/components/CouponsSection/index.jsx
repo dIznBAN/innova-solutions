@@ -30,7 +30,7 @@ const CouponsSection = () => {
         const storeMap = {};
         stores.forEach(s => { storeMap[s.id] = s; });
         const normalized = rawCoupons
-          .filter(c => new Date(c.valid_until) >= new Date())
+          .filter(c => storeMap[c.store_id]?.status === 'Aprovada' && new Date(c.valid_until) >= new Date())
           .sort((a, b) => a.id - b.id)
           .slice(0, 6)
           .map(c => {

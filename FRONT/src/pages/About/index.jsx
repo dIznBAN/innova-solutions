@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaUsers, FaCalendarAlt, FaEnvelope, FaHandshake, FaRocket } from 'react-icons/fa';
+import api from '../../services/api';
 import {
   PageWrapper, Hero, HeroBadge, HeroTitle, HeroSubtitle, HeroMeta, MetaItem,
   ContentWrapper, Section, SectionHeader, SectionNumber, SectionTitle, SectionText,
@@ -9,13 +11,6 @@ import {
   TeamGrid, TeamCard, TeamAvatar, TeamName, TeamRole
 } from '../Privacy/styles';
 
-const stats = [
-  { number: '5+', label: 'Lojas Parceiras' },
-  { number: '100%', label: 'Gratuito para usuários' },
-  { number: '2025', label: 'Ano de fundação' },
-  { number: '24/7', label: 'Cupons disponíveis' },
-];
-
 const values = [
   { icon: '💎', title: 'Qualidade', text: 'Curadoria rigorosa de parceiros para garantir as melhores ofertas do segmento.' },
   { icon: '🔒', title: 'Segurança', text: 'Seus dados protegidos com as melhores práticas de segurança e conformidade com a LGPD.' },
@@ -24,7 +19,7 @@ const values = [
 ];
 
 const team = [
-  { name: 'João Victor', role: 'Fundador & Dev', initial: 'J' },
+  { name: 'João e Victor', role: 'Fundador & Dev', initial: 'J' },
   { name: 'Equipe Innova', role: 'Desenvolvimento', initial: 'E' },
 ];
 
@@ -39,6 +34,32 @@ const itemVariants = {
 };
 
 const About = () => {
+  const [stats, setStats] = useState([
+    { number: '—', label: 'Lojas Parceiras' },
+    { number: '100%', label: 'Gratuito para usuários' },
+    { number: '2025', label: 'Ano de fundação' },
+    { number: '—', label: 'Cupons disponíveis' },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [stores, coupons] = await Promise.all([api.getAllStores(), api.getAllCoupons()]);
+        const approvedStores = stores.filter(s => s.status === 'Aprovada');
+        const approvedIds = new Set(approvedStores.map(s => s.id));
+        const activeCoupons = coupons.filter(c => approvedIds.has(c.store_id) && new Date(c.valid_until) >= new Date());
+        setStats(prev => prev.map(s => {
+          if (s.label === 'Lojas Parceiras') return { ...s, number: String(approvedStores.length) };
+          if (s.label === 'Cupons disponíveis') return { ...s, number: String(activeCoupons.length) };
+          return s;
+        }));
+      } catch (e) {
+        console.error('Erro ao carregar stats:', e);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <PageWrapper>
       <Hero>

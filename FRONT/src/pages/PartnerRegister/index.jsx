@@ -381,6 +381,7 @@ const PartnerRegister = () => {
                       value={formData.validUntil}
                       onChange={handleChange}
                       error={errors.validUntil}
+                      min={new Date().toISOString().split('T')[0]}
                     />
                   </InputWrapper>
                   {errors.validUntil && <ErrorMessage>{errors.validUntil}</ErrorMessage>}
