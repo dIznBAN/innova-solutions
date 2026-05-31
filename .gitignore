@@ -1,6 +1,7 @@
 node_modules/
 FRONT/node_modules/
 BACK/target/
+innova-mobile-clean-main/.expo/
 .env
 *.env.local
 

@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Innova Solutions",
+    "slug": "innova-solutions",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#A67168"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.innovasolutions.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Precisamos acessar sua galeria para upload de fotos.",
+        "NSCameraUsageDescription": "Precisamos acessar sua câmera para foto de perfil."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#A67168"
+      },
+      "package": "com.innovasolutions.app",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Precisamos acessar sua galeria para upload de imagens."
+        }
+      ],
+      "expo-font"
+    ]
+  }
+}

@@ -113,7 +113,7 @@ public class storesServices {
         stores existente = findById(id);
         String normalized = status.substring(0, 1).toUpperCase() + status.substring(1).toLowerCase();
         existente.setStatus(normalized);
-        if (rejectionReason != null && !rejectionReason.isBlank()) {
+        if (rejectionReason != null && !rejectionReason.trim().isEmpty()) {
             existente.setRejection_reason(rejectionReason);
         }
         existente.setUpdated_at(LocalDateTime.now());
