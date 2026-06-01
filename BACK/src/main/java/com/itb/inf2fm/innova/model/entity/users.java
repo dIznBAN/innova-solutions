@@ -9,7 +9,7 @@ public class users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "firebase_uid", length = 128, nullable = false, unique = true)
     private String firebaseUid;
@@ -32,8 +32,8 @@ public class users {
     @Column(nullable = true)
     private LocalDateTime updated_at;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getFirebaseUid() { return firebaseUid; }
     public void setFirebaseUid(String firebaseUid) { this.firebaseUid = firebaseUid; }

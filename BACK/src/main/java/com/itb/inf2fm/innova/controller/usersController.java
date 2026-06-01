@@ -46,7 +46,7 @@ public class usersController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getById(@PathVariable String id) {
         try {
-            return ResponseEntity.ok(usersService.findById(Long.parseLong(id)));
+            return ResponseEntity.ok(usersService.findById(Integer.parseInt(id)));
         } catch (NumberFormatException e) {
             return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
@@ -64,7 +64,7 @@ public class usersController {
     @PutMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable String id, @RequestBody users user) {
         try {
-            return ResponseEntity.ok(usersService.update(Long.parseLong(id), user));
+            return ResponseEntity.ok(usersService.update(Integer.parseInt(id), user));
         } catch (NumberFormatException e) {
             return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {
@@ -78,15 +78,14 @@ public class usersController {
         if (requesterUid == null) return ResponseEntity.status(403).build();
 
         try {
-            Long userId = Long.parseLong(id);
-            users target = usersService.findById(userId);
+            users target = usersService.findById(Integer.parseInt(id));
 
             boolean isAdmin = isAdmin(request);
             boolean isSelf = target.getFirebaseUid().equals(requesterUid);
 
             if (!isAdmin && !isSelf) return ResponseEntity.status(403).build();
 
-            usersService.delete(userId);
+            usersService.delete(Integer.parseInt(id));
             Map<String, String> response = new HashMap<>();
             response.put("message", "Usuario deletado com sucesso");
             return ResponseEntity.ok(response);
@@ -104,7 +103,7 @@ public class usersController {
             String newRole = body.get("role");
             if (newRole == null || (!newRole.equals("ADMIN") && !newRole.equals("USER")))
                 return badRequest("Role inválido. Use ADMIN ou USER");
-            return ResponseEntity.ok(usersService.updateRole(Long.parseLong(id), newRole));
+            return ResponseEntity.ok(usersService.updateRole(Integer.parseInt(id), newRole));
         } catch (NumberFormatException e) {
             return badRequest("O id informado não é válido: " + id);
         } catch (RuntimeException e) {

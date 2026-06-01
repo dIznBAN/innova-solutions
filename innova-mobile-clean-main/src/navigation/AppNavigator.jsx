@@ -14,7 +14,6 @@ import StoresScreen from '../screens/StoresScreen';
 import AuthScreen from '../screens/AuthScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import PartnerRegisterScreen from '../screens/PartnerRegisterScreen';
 import MyStoresScreen from '../screens/MyStoresScreen';
 import MyStoreScreen from '../screens/MyStoreScreen';
 import AdminScreen from '../screens/AdminScreen';
@@ -83,7 +82,6 @@ export default function AppNavigator() {
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Auth" component={AuthScreen} options={{ title: 'Entrar / Criar Conta' }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Recuperar Senha' }} />
-        <Stack.Screen name="PartnerRegister" component={PartnerRegisterScreen} options={{ title: 'Cadastro de Parceiro' }} />
         <Stack.Screen name="MyStores" component={MyStoresScreen} options={{ title: 'Minhas Lojas' }} />
         <Stack.Screen name="MyStore" component={MyStoreScreen} options={{ title: 'Minha Loja' }} />
         <Stack.Screen name="Admin" component={AdminScreen} options={{ title: 'Painel Admin' }} />

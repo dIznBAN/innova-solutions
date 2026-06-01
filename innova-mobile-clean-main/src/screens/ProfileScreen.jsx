@@ -226,11 +226,6 @@ export default function ProfileScreen() {
         {/* Actions */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Conta</Text>
-          <TouchableOpacity style={styles.actionRow} onPress={() => navigation.navigate('PartnerRegister')}>
-            <Ionicons name="business-outline" size={18} color={theme.colors.primary} />
-            <Text style={styles.actionText}>Cadastrar parceria</Text>
-            <Ionicons name="chevron-forward" size={16} color={theme.colors.gray} />
-          </TouchableOpacity>
           <TouchableOpacity style={styles.actionRow} onPress={logout}>
             <Ionicons name="log-out-outline" size={18} color={theme.colors.error} />
             <Text style={[styles.actionText, { color: theme.colors.error }]}>Sair da conta</Text>

@@ -77,9 +77,6 @@ class ApiService {
   async updateUserRole(id, role) { return this.request(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }); }
   async deleteUser(id) { return this.request(`/users/${id}`, { method: 'DELETE' }); }
 
-  async registerPartner(data) {
-    return this.request('/stores/register', { method: 'POST', body: JSON.stringify(data) });
-  }
 
   async getAllCoupons() { return this.request('/coupons'); }
   async getAllStores() { return this.request('/stores'); }

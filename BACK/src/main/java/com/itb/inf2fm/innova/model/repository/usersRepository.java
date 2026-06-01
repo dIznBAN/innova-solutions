@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import com.itb.inf2fm.innova.model.entity.users;
 
 @Repository
-public interface usersRepository extends JpaRepository<users, Long> {
+public interface usersRepository extends JpaRepository<users, Integer> {
     users findByFirebaseUid(String firebaseUid);
     boolean existsByFirebaseUid(String firebaseUid);
 }

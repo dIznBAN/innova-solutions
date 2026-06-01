@@ -123,12 +123,6 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.quickLinkText}>Lojas Parceiras</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('PartnerRegister')}>
-            <View style={styles.quickLinkIcon}>
-              <Ionicons name="business" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.quickLinkText}>Seja Parceiro</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('About')}>
             <View style={styles.quickLinkIcon}>
               <Ionicons name="information-circle" size={24} color={theme.colors.primary} />

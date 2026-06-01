@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.itb.inf2fm.innova.model.entity.users;
 import com.itb.inf2fm.innova.model.repository.usersRepository;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 
 @Service
 public class usersService {
@@ -21,7 +22,7 @@ public class usersService {
         return usersRepository.save(user);
     }
 
-    public users findById(Long id) {
+    public users findById(Integer id) {
         return usersRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario não encontrado: " + id));
     }
@@ -34,7 +35,7 @@ public class usersService {
         return usersRepository.existsByFirebaseUid(firebaseUid);
     }
 
-    public users update(Long id, users user) {
+    public users update(Integer id, users user) {
         users existente = findById(id);
         existente.setName(user.getName());
         existente.setEmail(user.getEmail());
@@ -42,17 +43,20 @@ public class usersService {
         return usersRepository.save(existente);
     }
 
-    public users updateRole(Long id, String role) {
+    public users updateRole(Integer id, String role) {
         users existente = findById(id);
         existente.setRole(role);
         return usersRepository.save(existente);
     }
 
-    public void delete(Long id) {
+    public void delete(Integer id) {
         users user = findById(id);
         try {
             FirebaseAuth.getInstance().deleteUser(user.getFirebaseUid());
-        } catch (Exception ignored) {}
+        } catch (FirebaseAuthException e) {
+            System.err.println("[usersService] Erro ao deletar usuário do Firebase: " + e.getMessage());
+            throw new RuntimeException("Erro ao deletar usuário do Firebase: " + e.getMessage());
+        }
         usersRepository.delete(user);
     }
 }
