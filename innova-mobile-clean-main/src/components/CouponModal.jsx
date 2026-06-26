@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View, Text, Modal, StyleSheet, TouchableOpacity,
-  Image, ScrollView, Linking,
+  Image, ScrollView, Linking, FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -12,8 +12,11 @@ import api from '../services/api';
 export default function CouponModal({ coupon, visible, onClose }) {
   const navigation = useNavigation();
   const { isAuthenticated } = useAuth();
+  const [lightboxImg, setLightboxImg] = useState(null);
 
   if (!coupon) return null;
+
+  const catalogImages = coupon.catalogImages || [];
 
   const handleUseOffer = async () => {
     if (!isAuthenticated) {
@@ -44,8 +47,8 @@ export default function CouponModal({ coupon, visible, onClose }) {
             <Ionicons name="close" size={22} color={theme.colors.text} />
           </TouchableOpacity>
 
-          {coupon.image ? (
-            <Image source={{ uri: coupon.image }} style={styles.image} />
+          {coupon.storeImage ? (
+            <Image source={{ uri: coupon.storeImage }} style={styles.image} />
           ) : (
             <View style={styles.placeholder}>
               <Text style={styles.placeholderLetter}>
@@ -65,6 +68,24 @@ export default function CouponModal({ coupon, visible, onClose }) {
                 <Text style={styles.sectionTitle}>{coupon.title}</Text>
               </View>
             ) : null}
+
+            {catalogImages.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Catálogo de Produtos</Text>
+                <FlatList
+                  data={catalogImages}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(_, i) => String(i)}
+                  contentContainerStyle={{ gap: 10 }}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => setLightboxImg(item)} activeOpacity={0.85}>
+                      <Image source={{ uri: item }} style={styles.catalogThumb} />
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            )}
 
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Descrição da Oferta</Text>
@@ -120,6 +141,15 @@ export default function CouponModal({ coupon, visible, onClose }) {
           </ScrollView>
         </View>
       </View>
+
+      {/* Lightbox */}
+      <Modal visible={!!lightboxImg} transparent animationType="fade" onRequestClose={() => setLightboxImg(null)}>
+        <TouchableOpacity style={styles.lightboxOverlay} activeOpacity={1} onPress={() => setLightboxImg(null)}>
+          {lightboxImg && (
+            <Image source={{ uri: lightboxImg }} style={styles.lightboxImg} resizeMode="contain" />
+          )}
+        </TouchableOpacity>
+      </Modal>
     </Modal>
   );
 }
@@ -176,4 +206,17 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md, paddingVertical: 12,
   },
   secondaryBtnText: { color: theme.colors.primary, fontWeight: '600', fontSize: 15 },
+  catalogThumb: {
+    width: 100, height: 100,
+    borderRadius: 10,
+    borderWidth: 2, borderColor: theme.colors.secondary,
+  },
+  lightboxOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.88)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  lightboxImg: {
+    width: '92%', height: '70%',
+    borderRadius: 12,
+  },
 });

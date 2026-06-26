@@ -33,7 +33,7 @@ export default function HomeScreen() {
               id: c.id,
               storeName: store.name,
               discount: c.discount,
-              image: c.image_url?.trim() || store.image_url?.trim() || null,
+              image: store.image_url?.trim() || null,
               title: c.title || '',
             };
           });
@@ -117,17 +117,17 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Navegação Rápida</Text>
         <View style={styles.quickLinks}>
-          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Lojas')}>
+          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Cupons')}>
             <View style={styles.quickLinkIcon}>
-              <Ionicons name="storefront" size={24} color={theme.colors.primary} />
+              <Ionicons name="pricetag" size={24} color={theme.colors.primary} />
             </View>
-            <Text style={styles.quickLinkText}>Lojas Parceiras</Text>
+            <Text style={styles.quickLinkText}>Ver Cupons</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('About')}>
+          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Meus Cupons')}>
             <View style={styles.quickLinkIcon}>
-              <Ionicons name="information-circle" size={24} color={theme.colors.primary} />
+              <Ionicons name="bookmark" size={24} color={theme.colors.primary} />
             </View>
-            <Text style={styles.quickLinkText}>Sobre Nós</Text>
+            <Text style={styles.quickLinkText}>Meus Cupons</Text>
           </TouchableOpacity>
         </View>
       </View>

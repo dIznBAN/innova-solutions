@@ -31,15 +31,17 @@ const CouponsSection = () => {
         stores.forEach(s => { storeMap[s.id] = s; });
         const normalized = rawCoupons
           .filter(c => storeMap[c.store_id]?.status === 'Aprovada' && new Date(c.valid_until) >= new Date())
-          .sort((a, b) => a.id - b.id)
-          .slice(0, 6)
+          .sort((a, b) => b.discount - a.discount || new Date(a.valid_until) - new Date(b.valid_until))
+          .slice(0, 4)
           .map(c => {
             const store = storeMap[c.store_id] || {};
             return {
               id: c.id,
               storeName: store.name || 'Loja',
               discount: c.discount,
-              image: c.image_url?.trim() || store.image_url?.trim() || null,
+              image: store.image_url?.trim() || null,
+              storeImage: store.image_url?.trim() || null,
+              catalogImages: c.catalog_images || [],
               website: store.website_url || '#',
               description: c.description || '',
               title: c.title || '',

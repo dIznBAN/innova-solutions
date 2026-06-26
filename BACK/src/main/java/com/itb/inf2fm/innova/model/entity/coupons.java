@@ -1,7 +1,10 @@
 package com.itb.inf2fm.innova.model.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 
 @Entity
@@ -28,6 +31,10 @@ public class coupons {
 
     @Column(length = 255, nullable = true)
     private String image_url;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "nvarchar(max)", nullable = true)
+    private List<String> catalog_images;
 
     @Column(nullable = false)
     private LocalDateTime valid_from;
@@ -86,6 +93,14 @@ public class coupons {
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+    public List<String> getCatalog_images() {
+        return catalog_images;
+    }
+
+    public void setCatalog_images(List<String> catalog_images) {
+        this.catalog_images = catalog_images;
     }
 
     public LocalDateTime getValid_from() {

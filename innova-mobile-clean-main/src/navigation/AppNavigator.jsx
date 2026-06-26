@@ -10,16 +10,9 @@ import { View, ActivityIndicator } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import CouponsScreen from '../screens/CouponsScreen';
 import MyCouponsScreen from '../screens/MyCouponsScreen';
-import StoresScreen from '../screens/StoresScreen';
 import AuthScreen from '../screens/AuthScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import MyStoresScreen from '../screens/MyStoresScreen';
-import MyStoreScreen from '../screens/MyStoreScreen';
-import AdminScreen from '../screens/AdminScreen';
-import TermsScreen from '../screens/TermsScreen';
-import PrivacyScreen from '../screens/PrivacyScreen';
-import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -38,11 +31,10 @@ function MainTabs() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           const icons = {
-            Início: focused ? 'home' : 'home-outline',
-            Cupons: focused ? 'pricetag' : 'pricetag-outline',
+            'Início': focused ? 'home' : 'home-outline',
+            'Cupons': focused ? 'pricetag' : 'pricetag-outline',
             'Meus Cupons': focused ? 'bookmark' : 'bookmark-outline',
-            Lojas: focused ? 'storefront' : 'storefront-outline',
-            Perfil: focused ? 'person' : 'person-outline',
+            'Perfil': focused ? 'person' : 'person-outline',
           };
           return <Ionicons name={icons[route.name] || 'ellipse'} size={size} color={color} />;
         },
@@ -59,7 +51,6 @@ function MainTabs() {
       {isAuthenticated && (
         <Tab.Screen name="Meus Cupons" component={MyCouponsScreen} />
       )}
-      <Tab.Screen name="Lojas" component={StoresScreen} />
       <Tab.Screen name="Perfil" component={isAuthenticated ? ProfileScreen : AuthScreen} />
     </Tab.Navigator>
   );
@@ -82,12 +73,6 @@ export default function AppNavigator() {
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="Auth" component={AuthScreen} options={{ title: 'Entrar / Criar Conta' }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Recuperar Senha' }} />
-        <Stack.Screen name="MyStores" component={MyStoresScreen} options={{ title: 'Minhas Lojas' }} />
-        <Stack.Screen name="MyStore" component={MyStoreScreen} options={{ title: 'Minha Loja' }} />
-        <Stack.Screen name="Admin" component={AdminScreen} options={{ title: 'Painel Admin' }} />
-        <Stack.Screen name="Terms" component={TermsScreen} options={{ title: 'Termos de Uso' }} />
-        <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ title: 'Política de Privacidade' }} />
-        <Stack.Screen name="About" component={AboutScreen} options={{ title: 'Sobre' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

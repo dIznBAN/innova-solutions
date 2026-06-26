@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../services/api'
 import { useAuth } from '../../hooks/useAuth'
 import {
   Overlay, Modal, CloseButton, Header, StoreImage, StoreName, Discount,
-  Content, Section, SectionTitle, Text, RulesList, RuleItem, Footer, CouponButton
+  Content, Section, SectionTitle, Text, RulesList, RuleItem, Footer, CouponButton,
+  CatalogSection, CatalogTitle, CatalogScroll, CatalogThumb, LightboxOverlay, LightboxImg
 } from './styles'
 
 const CouponModal = ({ coupon, isOpen, onClose }) => {
@@ -12,6 +13,30 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
 
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
+  const [lightboxSrc, setLightboxSrc] = useState(null)
+  const scrollRef = useRef(null)
+  const isDragging = useRef(false)
+  const startX = useRef(0)
+  const scrollLeft = useRef(0)
+
+  const handleMouseDown = (e) => {
+    isDragging.current = true
+    startX.current = e.pageX - scrollRef.current.offsetLeft
+    scrollLeft.current = scrollRef.current.scrollLeft
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return
+    e.preventDefault()
+    const x = e.pageX - scrollRef.current.offsetLeft
+    scrollRef.current.scrollLeft = scrollLeft.current - (x - startX.current)
+  }
+
+  const handleMouseUp = () => { isDragging.current = false }
+
+  const handleThumbClick = (url) => {
+    if (!isDragging.current) setLightboxSrc(url)
+  }
 
   const handleUseOffer = async () => {
     if (!isAuthenticated) {
@@ -26,14 +51,17 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
     navigate('/meus-cupons')
   }
 
+  const catalogImages = coupon.catalogImages || []
+
   return (
+    <>
     <Overlay onClick={onClose}>
       <Modal onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={onClose}>×</CloseButton>
 
         <Header>
-          {coupon.image
-            ? <StoreImage src={coupon.image} alt={coupon.storeName} />
+          {coupon.storeImage
+            ? <StoreImage src={coupon.storeImage} alt={coupon.storeName} />
             : <div style={{
                 width: '100%', height: '160px',
                 background: 'linear-gradient(135deg, #CDA09B, #A67168)',
@@ -53,6 +81,25 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
             <Section>
               <SectionTitle>{coupon.title}</SectionTitle>
             </Section>
+          )}
+
+          {catalogImages.length > 0 && (
+            <CatalogSection style={{ padding: '0 0 1.5rem' }}>
+              <CatalogTitle>Catálogo de Produtos</CatalogTitle>
+              <CatalogScroll
+                ref={scrollRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
+                {catalogImages.map((url, i) => (
+                  <CatalogThumb key={i} onClick={() => handleThumbClick(url)}>
+                    <img src={url} alt={`produto ${i + 1}`} draggable={false} />
+                  </CatalogThumb>
+                ))}
+              </CatalogScroll>
+            </CatalogSection>
           )}
 
           <Section>
@@ -90,6 +137,13 @@ const CouponModal = ({ coupon, isOpen, onClose }) => {
         </Footer>
       </Modal>
     </Overlay>
+
+    {lightboxSrc && (
+      <LightboxOverlay onClick={() => setLightboxSrc(null)}>
+        <LightboxImg src={lightboxSrc} alt="produto ampliado" />
+      </LightboxOverlay>
+    )}
+    </>  
   )
 }
 

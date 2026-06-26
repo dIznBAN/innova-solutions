@@ -163,3 +163,72 @@ export const CouponButton = styled.button`
     box-shadow: 0 8px 25px rgba(205, 160, 155, 0.3);
   }
 `
+
+export const CatalogSection = styled.div`
+  padding: 0 2rem 1.5rem;
+`
+
+export const CatalogTitle = styled.h3`
+  color: ${theme.colors.primary};
+  font-family: ${theme.fonts.secondary};
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid ${theme.colors.secondary};
+  padding-bottom: 0.5rem;
+`
+
+export const CatalogScroll = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  cursor: grab;
+  user-select: none;
+
+  &:active { cursor: grabbing; }
+
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: ${theme.colors.primaryLight};
+    border-radius: 4px;
+  }
+`
+
+export const CatalogThumb = styled.div`
+  flex-shrink: 0;
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 2px solid ${theme.colors.secondary};
+    border-radius: 10px;
+    transition: border-color 0.2s;
+  }
+
+  &:hover img { border-color: ${theme.colors.primary}; }
+`
+
+export const LightboxOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: zoom-out;
+`
+
+export const LightboxImg = styled.img`
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+`

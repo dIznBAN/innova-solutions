@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity,
-  Image, Modal, ActivityIndicator,
+  Image, Modal, ActivityIndicator, useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
@@ -22,7 +22,9 @@ const normalizeCoupons = (coupons, stores) => {
         id: c.id,
         storeName: store.name,
         discount: c.discount,
-        image: c.image_url?.trim() || store.image_url?.trim() || null,
+        image: store.image_url?.trim() || null,
+        storeImage: store.image_url?.trim() || null,
+        catalogImages: c.catalog_images || [],
         website: store.website_url || null,
         description: c.description || '',
         title: c.title || '',
@@ -32,6 +34,8 @@ const normalizeCoupons = (coupons, stores) => {
 };
 
 export default function CouponsScreen() {
+  const { width } = useWindowDimensions();
+  const CARD_W = (width - 48) / 2;
   const [searchTerm, setSearchTerm] = useState('');
   const [allCoupons, setAllCoupons] = useState([]);
   const [filteredCoupons, setFilteredCoupons] = useState([]);
@@ -68,7 +72,7 @@ export default function CouponsScreen() {
 
   const renderCoupon = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { width: CARD_W }]}
       onPress={() => setSelectedCoupon(item)}
       activeOpacity={0.85}
     >
@@ -180,8 +184,6 @@ export default function CouponsScreen() {
   );
 }
 
-const CARD_W = (require('react-native').Dimensions.get('window').width - 48) / 2;
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   searchRow: {
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
   listContent: { padding: 16 },
   row: { gap: 16, marginBottom: 16 },
   card: {
-    width: CARD_W, backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg, overflow: 'hidden',
     ...theme.shadow.sm,
   },

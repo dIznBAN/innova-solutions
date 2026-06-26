@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, FlatList, StyleSheet, TouchableOpacity,
-  Image, Alert, ActivityIndicator, Linking,
+  Image, Alert, ActivityIndicator, Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import QRCode from 'react-native-qrcode-svg';
 import { theme } from '../theme';
 import api from '../services/api';
 
@@ -12,6 +13,7 @@ export default function MyCouponsScreen() {
   const [myCoupons, setMyCoupons] = useState([]);
   const [stores, setStores] = useState({});
   const [loading, setLoading] = useState(true);
+  const [qrCoupon, setQrCoupon] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -31,8 +33,7 @@ export default function MyCouponsScreen() {
   useFocusEffect(useCallback(() => { fetchData(); }, []));
 
   const handleUseCoupon = (coupon) => {
-    const store = stores[coupon.store_id];
-    if (store?.website_url) Linking.openURL(store.website_url);
+    setQrCoupon(coupon);
   };
 
   const handleRemoveCoupon = (couponId) => {
@@ -107,6 +108,10 @@ export default function MyCouponsScreen() {
     </View>
   );
 
+  const qrValue = qrCoupon
+    ? `INNOVA|COUPON:${qrCoupon.id}|STORE:${qrCoupon.store_id}|DISCOUNT:${qrCoupon.discount}%|VALID:${new Date(qrCoupon.valid_until).toLocaleDateString('pt-BR')}`
+    : 'INNOVA';
+
   return (
     <View style={styles.container}>
       {myCoupons.length === 0 ? (
@@ -124,6 +129,25 @@ export default function MyCouponsScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      <Modal visible={!!qrCoupon} transparent animationType="fade" onRequestClose={() => setQrCoupon(null)}>
+        <View style={styles.qrOverlay}>
+          <View style={styles.qrBox}>
+            <Text style={styles.qrTitle}>Apresente ao vendedor</Text>
+            <Text style={styles.qrStoreName}>{stores[qrCoupon?.store_id]?.name}</Text>
+            <View style={styles.qrDiscount}>
+              <Text style={styles.qrDiscountText}>{qrCoupon?.discount}% OFF</Text>
+            </View>
+            <View style={styles.qrWrapper}>
+              <QRCode value={qrValue} size={200} color={theme.colors.primaryDark} />
+            </View>
+            <Text style={styles.qrHint}>Válido até {qrCoupon ? new Date(qrCoupon.valid_until).toLocaleDateString('pt-BR') : ''}</Text>
+            <TouchableOpacity style={styles.qrClose} onPress={() => setQrCoupon(null)}>
+              <Text style={styles.qrCloseText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -175,4 +199,30 @@ const styles = StyleSheet.create({
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: theme.colors.text, marginTop: 16, marginBottom: 8 },
   emptyDesc: { fontSize: 14, color: theme.colors.textSecondary, textAlign: 'center', lineHeight: 20 },
+  qrOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  qrBox: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 24, padding: 28,
+    alignItems: 'center', width: '100%',
+    ...theme.shadow.sm,
+  },
+  qrTitle: { fontSize: 18, fontWeight: '800', color: theme.colors.text, marginBottom: 4 },
+  qrStoreName: { fontSize: 15, color: theme.colors.textSecondary, marginBottom: 12 },
+  qrDiscount: {
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 20, paddingHorizontal: 20, paddingVertical: 6,
+    marginBottom: 20,
+  },
+  qrDiscountText: { color: theme.colors.primaryDark, fontWeight: '800', fontSize: 18 },
+  qrWrapper: {
+    padding: 16, backgroundColor: '#fff',
+    borderRadius: 16, borderWidth: 2,
+    borderColor: theme.colors.secondary, marginBottom: 16,
+  },
+  qrHint: { fontSize: 13, color: theme.colors.textSecondary, marginBottom: 20 },
+  qrClose: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12, paddingVertical: 12, paddingHorizontal: 40,
+  },
+  qrCloseText: { color: theme.colors.white, fontWeight: '700', fontSize: 15 },
 });

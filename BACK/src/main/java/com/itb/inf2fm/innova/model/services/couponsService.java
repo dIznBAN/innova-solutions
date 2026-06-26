@@ -36,6 +36,7 @@ public class couponsService {
         couponsExistente.setDiscount(coupons.getDiscount());
         couponsExistente.setAffiliate_link(coupons.getAffiliate_link());
         couponsExistente.setImage_url(coupons.getImage_url());
+        couponsExistente.setCatalog_images(coupons.getCatalog_images());
         couponsExistente.setValid_from(coupons.getValid_from());
         couponsExistente.setValid_until(coupons.getValid_until());
         return couponsRepository.save(couponsExistente);

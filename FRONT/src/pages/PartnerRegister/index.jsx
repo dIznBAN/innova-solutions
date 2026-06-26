@@ -23,7 +23,6 @@ import {
 const BENEFITS = [
   { icon: <FaHandshake />, text: 'Alcance milhares de clientes qualificados' },
   { icon: <FaTicketAlt />, text: 'Gerencie seus cupons com facilidade' },
-  { icon: <FaChartLine />, text: 'Acompanhe métricas em tempo real' },
 ]
 
 const PartnerRegister = () => {
@@ -40,6 +39,8 @@ const PartnerRegister = () => {
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [catalogFiles, setCatalogFiles] = useState([])
+  const [catalogPreviews, setCatalogPreviews] = useState([])
 
   const formatPhone = (v) => {
     const n = v.replace(/\D/g, '')
@@ -80,6 +81,7 @@ const PartnerRegister = () => {
     else if (formData.discount < 1 || formData.discount > 100) e.discount = 'Entre 1% e 100%'
     if (!formData.validUntil) e.validUntil = 'Data de validade é obrigatória'
     else if (new Date(formData.validUntil) <= new Date()) e.validUntil = 'A data deve ser futura'
+    if (catalogPreviews.length < 4) e.catalog = 'Adicione pelo menos 4 fotos no catálogo'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -95,9 +97,19 @@ const PartnerRegister = () => {
     setImagePreview(URL.createObjectURL(file))
   }
 
-  const handleImageRemove = () => {
-    setImageFile(null)
-    setImagePreview('')
+  const handleCatalogChange = (e) => {
+    const files = Array.from(e.target.files)
+    const remaining = 12 - catalogPreviews.length
+    if (files.length === 0) return
+    const allowed = files.slice(0, remaining).filter(f => f.size <= 5 * 1024 * 1024)
+    const previews = allowed.map(f => URL.createObjectURL(f))
+    setCatalogFiles(prev => [...prev, ...allowed])
+    setCatalogPreviews(prev => [...prev, ...previews])
+  }
+
+  const handleRemoveCatalogImage = (index) => {
+    setCatalogFiles(prev => prev.filter((_, i) => i !== index))
+    setCatalogPreviews(prev => prev.filter((_, i) => i !== index))
   }
 
   const uploadToImgBB = async (file) => {
@@ -128,7 +140,10 @@ const PartnerRegister = () => {
         imageUrl = await uploadToImgBB(imageFile)
         setUploadingImage(false)
       }
-      await ApiService.registerPartner({ ...formData, imageUrl, firebaseUid: user?.uid })
+      setUploadingImage(true)
+      const catalogUrls = await Promise.all(catalogFiles.map(f => uploadToImgBB(f)))
+      setUploadingImage(false)
+      await ApiService.registerPartner({ ...formData, imageUrl, catalogImages: catalogUrls, firebaseUid: user?.uid })
       setSubmitted(true)
     } catch (err) {
       setUploadingImage(false)
@@ -397,6 +412,37 @@ const PartnerRegister = () => {
                   value={formData.description}
                   onChange={handleChange}
                 />
+              </InputGroup>
+
+              <InputGroup>
+                <Label>Catálogo do Cupom ({catalogPreviews.length}/12) *</Label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {catalogPreviews.map((url, i) => (
+                    <div key={i} style={{ position: 'relative', width: 72, height: 72 }}>
+                      <img src={url} alt={`foto ${i+1}`} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: '2px solid #CDA09B' }} />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCatalogImage(i)}
+                        style={{
+                          position: 'absolute', top: -6, right: -6,
+                          background: '#C62828', color: 'white', border: 'none',
+                          borderRadius: '50%', width: 20, height: 20,
+                          cursor: 'pointer', fontSize: 12, display: 'flex',
+                          alignItems: 'center', justifyContent: 'center'
+                        }}
+                      ><FaTimes /></button>
+                    </div>
+                  ))}
+                  {catalogPreviews.length < 12 && (
+                    <ImageUploadLabel style={{ width: 72, height: 72, flexDirection: 'column', gap: '0.2rem', fontSize: '0.7rem', borderRadius: 8 }}>
+                      <FaCamera />
+                      Adicionar
+                      <input type="file" accept="image/*" multiple onChange={handleCatalogChange} />
+                    </ImageUploadLabel>
+                  )}
+                </div>
+                {errors.catalog && <ErrorMessage>{errors.catalog}</ErrorMessage>}
+                <ImageUploadHint>Mínimo 4, máximo 12 fotos. PNG, JPG ou WEBP — máx. 5MB cada</ImageUploadHint>
               </InputGroup>
             </Section>
 

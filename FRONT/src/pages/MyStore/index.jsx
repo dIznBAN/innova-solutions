@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import {
   FaStore, FaEdit, FaSave, FaTimes, FaTicketAlt, FaPlus,
   FaGlobe, FaPhone, FaEnvelope, FaCamera, FaCalendarAlt,
-  FaExclamationTriangle, FaTrash, FaPercent, FaTag
+  FaExclamationTriangle, FaTrash, FaPercent
 } from 'react-icons/fa'
 import {
   Container, ContentWrapper, PageHeader, PageTitle, StatusBadge,
@@ -25,7 +25,7 @@ const emptyForm = {
 }
 
 const emptyCoupon = {
-  title: '', discount: '', description: '', valid_until: '', imageFile: null, image_url: ''
+  title: '', discount: '', description: '', valid_until: '', catalogFiles: [], catalogPreviews: [], catalogUrls: []
 }
 
 const uploadToImgBB = async (file) => {
@@ -140,13 +140,15 @@ const MyStore = () => {
   }
 
   const openEditCoupon = (coupon) => {
+    const existingUrls = coupon.catalog_images || []
     setCouponForm({
       title: coupon.title || '',
       discount: coupon.discount || '',
       description: coupon.description || '',
       valid_until: coupon.valid_until ? coupon.valid_until.split('T')[0] : '',
-      image_url: coupon.image_url || '',
-      imageFile: null
+      catalogFiles: [],
+      catalogPreviews: existingUrls,
+      catalogUrls: existingUrls
     })
     setCouponModal(coupon)
   }
@@ -156,11 +158,33 @@ const MyStore = () => {
     setCouponForm(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleCouponImageChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    if (file.size > 5 * 1024 * 1024) { toast.error('Imagem muito grande. Máximo 5MB'); return }
-    setCouponForm(prev => ({ ...prev, imageFile: file, image_url: URL.createObjectURL(file) }))
+  const handleCatalogChange = (e) => {
+    const files = Array.from(e.target.files)
+    const current = couponForm.catalogPreviews.length
+    const remaining = 12 - current
+    if (files.length === 0) return
+    const allowed = files.slice(0, remaining)
+    allowed.forEach(f => {
+      if (f.size > 5 * 1024 * 1024) { toast.error(`${f.name} é grande demais. Máximo 5MB`); }
+    })
+    const valid = allowed.filter(f => f.size <= 5 * 1024 * 1024)
+    const previews = valid.map(f => URL.createObjectURL(f))
+    setCouponForm(prev => ({
+      ...prev,
+      catalogFiles: [...prev.catalogFiles, ...valid],
+      catalogPreviews: [...prev.catalogPreviews, ...previews]
+    }))
+  }
+
+  const handleRemoveCatalogImage = (index) => {
+    setCouponForm(prev => {
+      const isExisting = index < prev.catalogUrls.length
+      const newUrls = isExisting ? prev.catalogUrls.filter((_, i) => i !== index) : prev.catalogUrls
+      const newPreviews = prev.catalogPreviews.filter((_, i) => i !== index)
+      const newFilesIndex = index - prev.catalogUrls.length
+      const newFiles = isExisting ? prev.catalogFiles : prev.catalogFiles.filter((_, i) => i !== newFilesIndex)
+      return { ...prev, catalogUrls: newUrls, catalogPreviews: newPreviews, catalogFiles: newFiles }
+    })
   }
 
   const handleCouponSave = async (e) => {
@@ -169,17 +193,19 @@ const MyStore = () => {
     if (!couponForm.discount || couponForm.discount <= 0) { toast.error('Desconto inválido'); return }
     if (!couponForm.valid_until) { toast.error('Data de validade é obrigatória'); return }
 
+    if (couponForm.catalogPreviews.length < 4) { toast.error('Adicione pelo menos 4 fotos no catálogo'); return }
+
     setCouponLoading(true)
     try {
-      let imageUrl = couponForm.image_url
-      if (couponForm.imageFile) imageUrl = await uploadToImgBB(couponForm.imageFile)
+      const uploadedNewUrls = await Promise.all(couponForm.catalogFiles.map(f => uploadToImgBB(f)))
+      const allCatalogUrls = [...couponForm.catalogUrls, ...uploadedNewUrls]
 
       const payload = {
         store_id: userStore.id,
         title: couponForm.title,
         discount: parseFloat(couponForm.discount),
         description: couponForm.description,
-        image_url: imageUrl || null,
+        catalog_images: allCatalogUrls,
         valid_from: new Date().toISOString(),
         valid_until: couponForm.valid_until + 'T23:59:59',
       }
@@ -433,22 +459,33 @@ const MyStore = () => {
               </FormGroup>
 
               <FormGroup>
-                <Label>Imagem do cupom (opcional)</Label>
-                <ImageUploadBox $hasImage={!!couponForm.image_url}>
-                  <ImageThumb>
-                    {couponForm.image_url
-                      ? <img src={couponForm.image_url} alt="preview" />
-                      : <FaTag />
-                    }
-                  </ImageThumb>
-                  <ImageActions>
-                    <ImageLabel>
-                      <FaCamera /> {couponForm.image_url ? 'Alterar' : 'Adicionar imagem'}
-                      <input type="file" accept="image/*" onChange={handleCouponImageChange} />
+                <Label>Catálogo de Produtos ({couponForm.catalogPreviews.length}/12) *</Label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  {couponForm.catalogPreviews.map((url, i) => (
+                    <div key={i} style={{ position: 'relative', width: 72, height: 72 }}>
+                      <img src={url} alt={`foto ${i+1}`} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: '2px solid #CDA09B' }} />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCatalogImage(i)}
+                        style={{
+                          position: 'absolute', top: -6, right: -6,
+                          background: '#C62828', color: 'white', border: 'none',
+                          borderRadius: '50%', width: 20, height: 20,
+                          cursor: 'pointer', fontSize: 12, display: 'flex',
+                          alignItems: 'center', justifyContent: 'center'
+                        }}
+                      >×</button>
+                    </div>
+                  ))}
+                  {couponForm.catalogPreviews.length < 12 && (
+                    <ImageLabel style={{ width: 72, height: 72, flexDirection: 'column', gap: '0.2rem', fontSize: '0.7rem', borderRadius: 8, border: '2px dashed #CDA09B', background: '#FDF5F4' }}>
+                      <FaCamera />
+                      Adicionar
+                      <input type="file" accept="image/*" multiple onChange={handleCatalogChange} />
                     </ImageLabel>
-                    <ImageHint>PNG, JPG ou WEBP — máx. 5MB</ImageHint>
-                  </ImageActions>
-                </ImageUploadBox>
+                  )}
+                </div>
+                <ImageHint>Mínimo 4, máximo 12 fotos. PNG, JPG ou WEBP — máx. 5MB cada</ImageHint>
               </FormGroup>
 
               <ButtonRow>
