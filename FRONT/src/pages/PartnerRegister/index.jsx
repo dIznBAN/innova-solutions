@@ -97,6 +97,11 @@ const PartnerRegister = () => {
     setImagePreview(URL.createObjectURL(file))
   }
 
+  const handleImageRemove = () => {
+    setImageFile(null)
+    setImagePreview('')
+  }
+
   const handleCatalogChange = (e) => {
     const files = Array.from(e.target.files)
     const remaining = 12 - catalogPreviews.length
