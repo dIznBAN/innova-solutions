@@ -7,11 +7,13 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import api from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const { isAuthenticated } = useAuth();
   const [featuredCoupons, setFeaturedCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -117,18 +119,23 @@ export default function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Navegação Rápida</Text>
         <View style={styles.quickLinks}>
-          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Cupons')}>
+          <TouchableOpacity
+            style={[styles.quickLink, !isAuthenticated && styles.quickLinkAlone]}
+            onPress={() => navigation.navigate('Cupons')}
+          >
             <View style={styles.quickLinkIcon}>
               <Ionicons name="pricetag" size={24} color={theme.colors.primary} />
             </View>
             <Text style={styles.quickLinkText}>Ver Cupons</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Meus Cupons')}>
-            <View style={styles.quickLinkIcon}>
-              <Ionicons name="bookmark" size={24} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.quickLinkText}>Meus Cupons</Text>
-          </TouchableOpacity>
+          {isAuthenticated && (
+            <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Meus Cupons')}>
+              <View style={styles.quickLinkIcon}>
+                <Ionicons name="bookmark" size={24} color={theme.colors.primary} />
+              </View>
+              <Text style={styles.quickLinkText}>Meus Cupons</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -217,6 +224,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     ...theme.shadow.sm,
   },
+  quickLinkAlone: { flex: 0, flexBasis: '48%' },
   quickLinkIcon: {
     width: 48, height: 48,
     backgroundColor: theme.colors.secondary,
