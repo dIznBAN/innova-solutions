@@ -13,6 +13,10 @@ public class PartnerRegisterRequest {
     private String description;
     private String imageUrl;
     private String firebaseUid;
+    private java.util.List<String> catalogImages;
+
+    public java.util.List<String> getCatalogImages() { return catalogImages; }
+    public void setCatalogImages(java.util.List<String> catalogImages) { this.catalogImages = catalogImages; }
 
     public String getFirebaseUid() { return firebaseUid; }
     public void setFirebaseUid(String firebaseUid) { this.firebaseUid = firebaseUid; }

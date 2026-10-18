@@ -154,17 +154,9 @@ public class storesController {
 
     private boolean isAdmin(HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
-        if (uid == null) {
-            System.out.println("[isAdmin] firebaseUid nulo - token ausente ou inválido");
-            return false;
-        }
+        if (uid == null) return false;
         users u = usersService.findByFirebaseUid(uid);
-        if (u == null) {
-            System.out.println("[isAdmin] usuário não encontrado no banco para uid: " + uid);
-            return false;
-        }
-        System.out.println("[isAdmin] uid=" + uid + " role=" + u.getRole());
-        return "ADMIN".equals(u.getRole());
+        return u != null && "ADMIN".equals(u.getRole());
     }
 
     private ResponseEntity<Object> forbidden() {

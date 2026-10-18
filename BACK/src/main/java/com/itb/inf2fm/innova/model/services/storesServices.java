@@ -76,6 +76,7 @@ public class storesServices {
         coupon.setTitle(req.getCouponTitle());
         coupon.setDiscount(req.getDiscount());
         coupon.setDescription(req.getDescription());
+        coupon.setCatalog_images(req.getCatalogImages());
         coupon.setValid_from(LocalDateTime.now());
         coupon.setValid_until(LocalDate.parse(req.getValidUntil()).atTime(23, 59, 59));
         couponsRepository.save(coupon);

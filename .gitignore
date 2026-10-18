@@ -4,6 +4,8 @@ BACK/target/
 innova-mobile-clean-main/.expo/
 .env
 *.env.local
-
-node_modules
-node_modules
+FRONT/.env
+FRONT/.env.local
+innova-mobile-clean-main/.env
+innova-mobile-clean-main/.env.local
+BACK/src/main/resources/serviceAccountKey.json

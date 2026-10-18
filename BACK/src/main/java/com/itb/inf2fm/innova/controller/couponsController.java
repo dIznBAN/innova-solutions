@@ -29,11 +29,6 @@ public class couponsController {
         return ResponseEntity.ok(couponsService.findByStoreId(storeId));
     }
 
-    @GetMapping("/findAll")
-    public ResponseEntity<List<coupons>> findAll() {
-        return ResponseEntity.ok(couponsService.findAll());
-    }
-
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody coupons coupons) {
         if (coupons.getValid_until() == null || coupons.getValid_until().isBefore(LocalDateTime.now())) {
@@ -76,7 +71,6 @@ public class couponsController {
             couponsExistente.setTitle(coupons.getTitle());
             couponsExistente.setDescription(coupons.getDescription());
             couponsExistente.setDiscount(coupons.getDiscount());
-            couponsExistente.setAffiliate_link(coupons.getAffiliate_link());
             couponsExistente.setImage_url(coupons.getImage_url());
             couponsExistente.setCatalog_images(coupons.getCatalog_images());
             couponsExistente.setValid_from(coupons.getValid_from());

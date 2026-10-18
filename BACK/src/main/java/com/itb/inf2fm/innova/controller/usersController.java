@@ -113,10 +113,8 @@ public class usersController {
 
     private boolean isAdmin(HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
-        System.out.println("[isAdmin] UID extraído: " + uid);
         if (uid == null) return false;
         users u = usersService.findByFirebaseUid(uid);
-        System.out.println("[isAdmin] Role do usuário: " + (u != null ? u.getRole() : "usuário não encontrado"));
         return u != null && "ADMIN".equals(u.getRole());
     }
 

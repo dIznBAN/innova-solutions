@@ -27,9 +27,6 @@ public class coupons {
     private Double discount;
 
     @Column(length = 255, nullable = true)
-    private String affiliate_link;
-
-    @Column(length = 255, nullable = true)
     private String image_url;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -77,14 +74,6 @@ public class coupons {
 
     public void setDiscount(Double discount) {
         this.discount = discount;
-    }
-
-    public String getAffiliate_link() {
-        return affiliate_link;
-    }
-
-    public void setAffiliate_link(String affiliate_link) {
-        this.affiliate_link = affiliate_link;
     }
 
     public String getImage_url() {

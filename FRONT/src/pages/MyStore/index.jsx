@@ -36,7 +36,7 @@ const uploadToImgBB = async (file) => {
     reader.readAsDataURL(file)
   })
   const body = new URLSearchParams()
-  body.append('key', '06e7312be7cd16b207344fba43e96449')
+  body.append('key', import.meta.env.VITE_IMGBB_KEY)
   body.append('image', base64)
   const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body })
   const data = await res.json()
